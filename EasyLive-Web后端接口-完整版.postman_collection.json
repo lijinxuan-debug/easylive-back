@@ -1,0 +1,1482 @@
+{
+  "info": {
+    "name": "EasyLive Web 后端接口-完整版",
+    "description": "EasyLive Web 后端 API 完整接口集合\n\nToken 验证方式：Header webToken",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "webToken",
+        "value": "1ce7f0e7-23c2-48dc-8079-1ab4e9912808",
+        "in": "header"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "1. 基础接口",
+      "item": [
+        {
+          "name": "1.1 获取验证码",
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/account/checkCode",
+              "host": ["{{base_url}}"],
+              "path": ["account", "checkCode"]
+            },
+            "description": "生成算术验证码，返回 Base64 图片和验证码 Key"
+          },
+          "response": []
+        },
+        {
+          "name": "1.2 用户注册",
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "email", "value": "test@example.com", "type": "text"},
+                {"key": "nickName", "value": "测试用户", "type": "text"},
+                {"key": "registerPassword", "value": "Test1234", "type": "text"},
+                {"key": "checkCode", "value": "5", "type": "text"},
+                {"key": "checkCodeKey", "value": "{{checkCodeKey}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/account/register",
+              "host": ["{{base_url}}"],
+              "path": ["account", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.3 用户登录",
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "email", "value": "test@example.com", "type": "text"},
+                {"key": "password", "value": "Test1234", "type": "text"},
+                {"key": "checkCode", "value": "5", "type": "text"},
+                {"key": "checkCodeKey", "value": "{{checkCodeKey}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/account/login",
+              "host": ["{{base_url}}"],
+              "path": ["account", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.4 自动登录",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/account/autoLogin",
+              "host": ["{{base_url}}"],
+              "path": ["account", "autoLogin"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.5 用户登出",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/account/loginOut",
+              "host": ["{{base_url}}"],
+              "path": ["account", "loginOut"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.6 获取用户统计",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/account/getCountInfo",
+              "host": ["{{base_url}}"],
+              "path": ["account", "getCountInfo"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. 视频相关",
+      "item": [
+        {
+          "name": "2.1 获取推荐视频",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/video/loadCommendVideo",
+              "host": ["{{base_url}}"],
+              "path": ["video", "loadCommendVideo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.2 获取视频列表",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "pCategoryId", "value": "1", "type": "text"},
+                {"key": "categoryId", "value": "", "type": "text"},
+                {"key": "pageNo", "value": "1", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/video/loadVideo",
+              "host": ["{{base_url}}"],
+              "path": ["video", "loadVideo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.3 获取视频详情",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "videoId", "value": "{{videoId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/video/getVideoInfo",
+              "host": ["{{base_url}}"],
+              "path": ["video", "getVideoInfo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.4 获取视频播放列表",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "videoId", "value": "{{videoId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/video/loadVideoPList",
+              "host": ["{{base_url}}"],
+              "path": ["video", "loadVideoPList"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.5 搜索视频",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "keyword", "value": "{{keyword}}", "type": "text"},
+                {"key": "orderType", "value": "1", "type": "text"},
+                {"key": "pageNo", "value": "1", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/video/search",
+              "host": ["{{base_url}}"],
+              "path": ["video", "search"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.6 获取搜索热词",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/video/getHotWordTop",
+              "host": ["{{base_url}}"],
+              "path": ["video", "getHotWordTop"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.7 获取推荐视频",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "keyWord", "value": "推荐", "type": "text"},
+                {"key": "videoId", "value": "{{videoId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/video/getVideoRecommend",
+              "host": ["{{base_url}}"],
+              "path": ["video", "getVideoRecommend"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.8 获取热门视频",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "pageNo", "value": "1", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/video/loadHotVideoList",
+              "host": ["{{base_url}}"],
+              "path": ["video", "loadHotVideoList"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.9 上报视频播放在线人数",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "fileId", "value": "{{fileId}}", "type": "text"},
+                {"key": "deviceId", "value": "{{deviceId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/video/reportVideoPlayOnline",
+              "host": ["{{base_url}}"],
+              "path": ["video", "reportVideoPlayOnline"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. 评论相关",
+      "item": [
+        {
+          "name": "3.1 发布评论",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "videoId", "value": "{{videoId}}", "type": "text"},
+                {"key": "content", "value": "这是一条评论", "type": "text"},
+                {"key": "replyCommentId", "value": "", "type": "text"},
+                {"key": "imgPath", "value": "", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/comment/postComment",
+              "host": ["{{base_url}}"],
+              "path": ["comment", "postComment"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.2 加载评论",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "videoId", "value": "{{videoId}}", "type": "text"},
+                {"key": "pageNo", "value": "1", "type": "text"},
+                {"key": "orderType", "value": "0", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/comment/loadComment",
+              "host": ["{{base_url}}"],
+              "path": ["comment", "loadComment"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.3 置顶评论",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "commentId", "value": "{{commentId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/comment/top",
+              "host": ["{{base_url}}"],
+              "path": ["comment", "top"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.4 取消置顶",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "commentId", "value": "{{commentId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/comment/cancelTop",
+              "host": ["{{base_url}}"],
+              "path": ["comment", "cancelTop"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.5 删除评论",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "commentId", "value": "{{commentId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/comment/deleteComment",
+              "host": ["{{base_url}}"],
+              "path": ["comment", "deleteComment"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. 弹幕相关",
+      "item": [
+        {
+          "name": "4.1 发布弹幕",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "videoId", "value": "{{videoId}}", "type": "text"},
+                {"key": "fileId", "value": "{{fileId}}", "type": "text"},
+                {"key": "text", "value": "弹幕内容", "type": "text"},
+                {"key": "color", "value": "#FFFFFF", "type": "text"},
+                {"key": "mode", "value": "1", "type": "text"},
+                {"key": "time", "value": "10", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/danmu/postDanmu",
+              "host": ["{{base_url}}"],
+              "path": ["danmu", "postDanmu"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.2 加载弹幕",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "videoId", "value": "{{videoId}}", "type": "text"},
+                {"key": "fileId", "value": "{{fileId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/danmu/loadDanmu",
+              "host": ["{{base_url}}"],
+              "path": ["danmu", "loadDanmu"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. 用户操作（点赞、收藏、投币）",
+      "item": [
+        {
+          "name": "5.1 执行用户操作",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "videoId", "value": "{{videoId}}", "type": "text"},
+                {"key": "actionType", "value": "1", "type": "text"},
+                {"key": "actionCount", "value": "1", "type": "text"},
+                {"key": "commentId", "value": "", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/userAction/doAction",
+              "host": ["{{base_url}}"],
+              "path": ["userAction", "doAction"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. 消息相关",
+      "item": [
+        {
+          "name": "6.1 获取未读消息数量",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/message/getNoReadCount",
+              "host": ["{{base_url}}"],
+              "path": ["message", "getNoReadCount"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6.2 获取未读消息分组",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/message/getNoReadCountGroup",
+              "host": ["{{base_url}}"],
+              "path": ["message", "getNoReadCountGroup"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6.3 全部标记为已读",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "messageType", "value": "1", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/message/readAll",
+              "host": ["{{base_url}}"],
+              "path": ["message", "readAll"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6.4 加载消息列表",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "messageType", "value": "1", "type": "text"},
+                {"key": "pageNo", "value": "1", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/message/loadMessage",
+              "host": ["{{base_url}}"],
+              "path": ["message", "loadMessage"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6.5 删除消息",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "messageId", "value": "{{messageId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/message/delMessage",
+              "host": ["{{base_url}}"],
+              "path": ["message", "delMessage"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7. 文件相关",
+      "item": [
+        {
+          "name": "7.1 获取图片",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/file/getImage?sourceName={{sourceName}}",
+              "host": ["{{base_url}}"],
+              "path": ["file", "getImage"],
+              "query": [{"key": "sourceName", "value": "{{sourceName}}"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7.2 上传图片",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {"key": "file", "type": "file", "src": []},
+                {"key": "createThumbnail", "value": "false", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/file/uploadImage",
+              "host": ["{{base_url}}"],
+              "path": ["file", "uploadImage"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7.3 预上传视频",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "fileName", "value": "video.mp4", "type": "text"},
+                {"key": "chunks", "value": "10", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/file/preUploadVideo",
+              "host": ["{{base_url}}"],
+              "path": ["file", "preUploadVideo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7.4 上传视频分片",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {"key": "chunkFile", "type": "file", "src": []},
+                {"key": "chunkIndex", "value": "1", "type": "text"},
+                {"key": "uploadId", "value": "{{uploadId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/file/uploadVideo",
+              "host": ["{{base_url}}"],
+              "path": ["file", "uploadVideo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7.5 删除上传中的视频",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "uploadId", "value": "{{uploadId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/file/delUploadVideo",
+              "host": ["{{base_url}}"],
+              "path": ["file", "delUploadVideo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7.6 获取视频资源",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/file/videoResource/{{fileId}}",
+              "host": ["{{base_url}}"],
+              "path": ["file", "videoResource", "{{fileId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "8. 用户中心主页",
+      "item": [
+        {
+          "name": "8.1 获取用户信息",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "userId", "value": "{{userId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/home/getUserInfo",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "home", "getUserInfo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8.2 更新用户信息",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "avatar", "value": "{{avatar}}", "type": "text"},
+                {"key": "nickName", "value": "{{nickName}}", "type": "text"},
+                {"key": "sex", "value": "1", "type": "text"},
+                {"key": "birthday", "value": "", "type": "text"},
+                {"key": "school", "value": "", "type": "text"},
+                {"key": "noticeInfo", "value": "", "type": "text"},
+                {"key": "personalIntroduction", "value": "", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/home/updateUserInfo",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "home", "updateUserInfo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8.3 保存主题",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "theme", "value": "1", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/home/saveTheme",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "home", "saveTheme"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8.4 关注用户",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "focusUserId", "value": "{{userId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/home/focus",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "home", "focus"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8.5 取消关注",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "focusUserId", "value": "{{userId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/home/cancelFocus",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "home", "cancelFocus"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8.6 获取关注列表",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "pageNo", "value": "1", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/home/loadFocusList",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "home", "loadFocusList"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8.7 获取粉丝列表",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "pageNo", "value": "1", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/home/loadFansList",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "home", "loadFansList"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8.8 获取用户视频列表",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "userId", "value": "{{userId}}", "type": "text"},
+                {"key": "type", "value": "", "type": "text"},
+                {"key": "pageNo", "value": "1", "type": "text"},
+                {"key": "videoName", "value": "", "type": "text"},
+                {"key": "orderType", "value": "", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/home/loadVideoList",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "home", "loadVideoList"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8.9 获取用户收藏",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "userId", "value": "{{userId}}", "type": "text"},
+                {"key": "pageNo", "value": "1", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/home/loadUserCollection",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "home", "loadUserCollection"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "9. 视频发布",
+      "item": [
+        {
+          "name": "9.1 发布视频",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "videoId", "value": "", "type": "text"},
+                {"key": "videoCover", "value": "{{videoCover}}", "type": "text"},
+                {"key": "videoName", "value": "{{videoName}}", "type": "text"},
+                {"key": "pCategoryId", "value": "1", "type": "text"},
+                {"key": "categoryId", "value": "", "type": "text"},
+                {"key": "postType", "value": "0", "type": "text"},
+                {"key": "tags", "value": "标签", "type": "text"},
+                {"key": "introduction", "value": "简介", "type": "text"},
+                {"key": "interaction", "value": "1", "type": "text"},
+                {"key": "uploadFileList", "value": "{{uploadFileList}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/post/postVideo",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "post", "postVideo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9.2 加载视频列表（发布管理）",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "status", "value": "-1", "type": "text"},
+                {"key": "pageNo", "value": "1", "type": "text"},
+                {"key": "videoNameFuzzy", "value": "", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/post/loadVideoList",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "post", "loadVideoList"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9.3 获取视频数量统计",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ucenter/post/getVideoCountInfo",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "post", "getVideoCountInfo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9.4 获取视频编辑信息",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "videoId", "value": "{{videoId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/post/getVideoInfoByVideoId",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "post", "getVideoInfoByVideoId"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9.5 保存视频互动设置",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "videoId", "value": "{{videoId}}", "type": "text"},
+                {"key": "interaction", "value": "1", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/post/saveVideoInteraction",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "post", "saveVideoInteraction"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9.6 删除视频",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "videoId", "value": "{{videoId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/post/delVideo",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "post", "delVideo"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "10. 用户互动管理",
+      "item": [
+        {
+          "name": "10.1 加载所有视频",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ucenter/interaction/loadAllVideo",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "interaction", "loadAllVideo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10.2 加载评论",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "pageNo", "value": "1", "type": "text"},
+                {"key": "videoId", "value": "{{videoId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/interaction/loadComment",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "interaction", "loadComment"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10.3 删除评论",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "commentId", "value": "{{commentId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/interaction/delComment",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "interaction", "delComment"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10.4 加载弹幕",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "pageNo", "value": "1", "type": "text"},
+                {"key": "videoId", "value": "{{videoId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/interaction/loadDanmu",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "interaction", "loadDanmu"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10.5 删除弹幕",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "danmuId", "value": "{{danmuId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/interaction/delDanmu",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "interaction", "delDanmu"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "11. 视频系列",
+      "item": [
+        {
+          "name": "11.1 加载视频系列",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "userId", "value": "{{userId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/series/loadVideoSeries",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "series", "loadVideoSeries"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11.2 保存视频系列",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "seriesId", "value": "", "type": "text"},
+                {"key": "seriesName", "value": "系列名称", "type": "text"},
+                {"key": "seriesDescription", "value": "系列描述", "type": "text"},
+                {"key": "videoIds", "value": "video1,video2", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/series/saveVideoSeries",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "series", "saveVideoSeries"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11.3 加载所有视频",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "seriesId", "value": "", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/series/loadAllVideo",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "series", "loadAllVideo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11.4 获取系列详情",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "seriesId", "value": "{{seriesId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/series/getVideoSeriesDetail",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "series", "getVideoSeriesDetail"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11.5 保存系列视频",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "seriesId", "value": "{{seriesId}}", "type": "text"},
+                {"key": "videoIds", "value": "video1,video2", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/series/saveSeriesVideo",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "series", "saveSeriesVideo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11.6 删除系列视频",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "seriesId", "value": "{{seriesId}}", "type": "text"},
+                {"key": "videoId", "value": "{{videoId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/series/delSeriesVideo",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "series", "delSeriesVideo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11.7 删除系列",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "seriesId", "value": "{{seriesId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/series/delSeries",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "series", "delSeries"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11.8 修改系列排序",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "seriesIds", "value": "1,2,3", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/series/changeVideoSeriesSort",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "series", "changeVideoSeriesSort"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11.9 加载系列及视频",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "userId", "value": "{{userId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ucenter/series/loadVideoSeriesWithVideo",
+              "host": ["{{base_url}}"],
+              "path": ["ucenter", "series", "loadVideoSeriesWithVideo"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "12. 播放历史",
+      "item": [
+        {
+          "name": "12.1 加载播放历史",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "pageNo", "value": "1", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/history/loadHistory",
+              "host": ["{{base_url}}"],
+              "path": ["history", "loadHistory"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "12.2 清空播放历史",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/history/cleanAllHistory",
+              "host": ["{{base_url}}"],
+              "path": ["history", "cleanAllHistory"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "12.3 删除播放历史",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "videoId", "value": "{{videoId}}", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/history/delHistory",
+              "host": ["{{base_url}}"],
+              "path": ["history", "delHistory"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "13. 统计",
+      "item": [
+        {
+          "name": "13.1 获取实时统计信息",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/statistics/getActualTimeStatisticsInfo",
+              "host": ["{{base_url}}"],
+              "path": ["statistics", "getActualTimeStatisticsInfo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "13.2 获取周统计信息",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "dataType", "value": "1", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/statistics/getWeekStatisticsInfo",
+              "host": ["{{base_url}}"],
+              "path": ["statistics", "getWeekStatisticsInfo"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "14. 其他",
+      "item": [
+        {
+          "name": "14.1 获取所有分类",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/categoryInfo/loadAllCategoryInfo",
+              "host": ["{{base_url}}"],
+              "path": ["categoryInfo", "loadAllCategoryInfo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "14.2 获取系统设置",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/sysSetting/getSysSetting",
+              "host": ["{{base_url}}"],
+              "path": ["sysSetting", "getSysSetting"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:7071",
+      "type": "string"
+    },
+    {
+      "key": "checkCodeKey",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "videoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fileId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "deviceId",
+      "value": "test_device_001",
+      "type": "string"
+    },
+    {
+      "key": "uploadId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "commentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "danmuId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "seriesId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "videoCover",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "videoName",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "uploadFileList",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "messageId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "keyword",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "avatar",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "nickName",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sourceName",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

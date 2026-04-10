@@ -1,0 +1,328 @@
+{
+  "info": {
+    "name": "EasyLive Web 后端接口",
+    "description": "EasyLive Web 后端 API 接口集合",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "基础接口",
+      "item": [
+        {
+          "name": "1. 获取验证码",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/account/checkCode",
+              "host": ["{{base_url}}"],
+              "path": ["account", "checkCode"]
+            },
+            "description": "生成算术验证码，返回 Base64 图片和验证码 Key"
+          },
+          "response": [
+            {
+              "name": "成功响应",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/account/checkCode",
+                  "host": ["{{base_url}}"],
+                  "path": ["account", "checkCode"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"code\": 200,\n  \"message\": \"success\",\n  \"data\": {\n    \"checkCode\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...\",\n    \"checkCodeKey\": \"check_code_key_xxx\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "2. 用户注册",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "test@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "nickName",
+                  "value": "测试用户",
+                  "type": "text"
+                },
+                {
+                  "key": "registerPassword",
+                  "value": "Test1234",
+                  "type": "text"
+                },
+                {
+                  "key": "checkCode",
+                  "value": "5",
+                  "type": "text"
+                },
+                {
+                  "key": "checkCodeKey",
+                  "value": "{{checkCodeKey}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/account/register",
+              "host": ["{{base_url}}"],
+              "path": ["account", "register"]
+            },
+            "description": "使用邮箱注册新用户\n\n密码规则：\n- 必须包含大小写字母、数字\n- 长度：8-20 位"
+          },
+          "response": [
+            {
+              "name": "成功响应",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "email",
+                      "value": "test@example.com",
+                      "type": "text"
+                    },
+                    {
+                      "key": "nickName",
+                      "value": "测试用户",
+                      "type": "text"
+                    },
+                    {
+                      "key": "registerPassword",
+                      "value": "Test1234",
+                      "type": "text"
+                    },
+                    {
+                      "key": "checkCode",
+                      "value": "5",
+                      "type": "text"
+                    },
+                    {
+                      "key": "checkCodeKey",
+                      "value": "{{checkCodeKey}}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/account/register",
+                  "host": ["{{base_url}}"],
+                  "path": ["account", "register"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"code\": 200,\n  \"message\": \"success\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "3. 用户登录",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "test@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "Test1234",
+                  "type": "text"
+                },
+                {
+                  "key": "checkCode",
+                  "value": "5",
+                  "type": "text"
+                },
+                {
+                  "key": "checkCodeKey",
+                  "value": "{{checkCodeKey}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/account/login",
+              "host": ["{{base_url}}"],
+              "path": ["account", "login"]
+            },
+            "description": "用户登录，Token 会自动存储在 Cookie 中"
+          },
+          "response": [
+            {
+              "name": "成功响应",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "email",
+                      "value": "test@example.com",
+                      "type": "text"
+                    },
+                    {
+                      "key": "password",
+                      "value": "Test1234",
+                      "type": "text"
+                    },
+                    {
+                      "key": "checkCode",
+                      "value": "5",
+                      "type": "text"
+                    },
+                    {
+                      "key": "checkCodeKey",
+                      "value": "{{checkCodeKey}}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/account/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["account", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"code\": 200,\n  \"message\": \"success\",\n  \"data\": {\n    \"token\": \"web_token_xxx\",\n    \"userId\": \"user_id_xxx\",\n    \"nickName\": \"测试用户\",\n    \"email\": \"test@example.com\",\n    \"qq\": \"123456\",\n    \"status\": 0,\n    \"expireTime\": 1712736000000\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "4. 自动登录",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/account/autoLogin",
+              "host": ["{{base_url}}"],
+              "path": ["account", "autoLogin"]
+            },
+            "description": "根据 Cookie 中的 Token 自动登录，并延长 Token 有效期"
+          },
+          "response": [
+            {
+              "name": "成功响应",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/account/autoLogin",
+                  "host": ["{{base_url}}"],
+                  "path": ["account", "autoLogin"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"code\": 200,\n  \"message\": \"success\",\n  \"data\": {\n    \"token\": \"web_token_xxx\",\n    \"userId\": \"user_id_xxx\",\n    \"nickName\": \"测试用户\",\n    \"email\": \"test@example.com\",\n    \"qq\": \"123456\",\n    \"status\": 0,\n    \"expireTime\": 1712736000000\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "5. 用户登出",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/account/loginOut",
+              "host": ["{{base_url}}"],
+              "path": ["account", "loginOut"]
+            },
+            "description": "清除登录状态"
+          },
+          "response": [
+            {
+              "name": "成功响应",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/account/loginOut",
+                  "host": ["{{base_url}}"],
+                  "path": ["account", "loginOut"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"code\": 200,\n  \"message\": \"success\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "6. 获取用户统计",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/account/getCountInfo",
+              "host": ["{{base_url}}"],
+              "path": ["account", "getCountInfo"]
+            },
+            "description": "获取当前登录用户的统计数据（需要登录）"
+          },
+          "response": [
+            {
+              "name": "成功响应",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/account/getCountInfo",
+                  "host": ["{{base_url}}"],
+                  "path": ["account", "getCountInfo"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"code\": 200,\n  \"message\": \"success\",\n  \"data\": {\n    \"videoCount\": 10,\n    \"userCount\": 100,\n    \"commentCount\": 50,\n    \"likeCount\": 200,\n    \"collectCount\": 30\n  }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:7071",
+      "type": "string"
+    },
+    {
+      "key": "checkCodeKey",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

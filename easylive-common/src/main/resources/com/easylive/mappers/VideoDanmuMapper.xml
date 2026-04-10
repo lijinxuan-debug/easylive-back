@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easylive.mappers.VideoDanmuMapper">
+	<!--实体映射-->
+	<resultMap id="base_result_map" type="com.easylive.entity.po.VideoDanmu">
+		<!-- 自增ID -->
+		<id column="danmu_id" property="danmuId"/>
+		<!-- 视频ID -->
+		<result column="video_id" property="videoId"/>
+		<!-- 文件ID -->
+		<result column="file_id" property="fileId"/>
+		<!-- 用户ID -->
+		<result column="user_id" property="userId"/>
+		<!-- 发布时间 -->
+		<result column="post_time" property="postTime"/>
+		<!-- 内容 -->
+		<result column="text" property="text"/>
+		<!-- 展示位置 -->
+		<result column="mode" property="mode"/>
+		<!-- 文字颜色 -->
+		<result column="color" property="color"/>
+		<!-- 展示时间 -->
+		<result column="time" property="time"/>
+	</resultMap>
+
+	<!--通用结果查询列-->
+	<sql id="base_column_list">
+		v.danmu_id, v.video_id, v.file_id, v.user_id, v.post_time, v.text, v.mode, v.color, v.time
+	</sql>
+
+	<!--基础查询条件-->
+	<sql id="base_query_condition">
+		<if test="query.danmuId != null">
+			and v.danmu_id = #{query.danmuId}
+		</if>
+		<if test="query.videoId != null and query.videoId != ''">
+			and v.video_id = #{query.videoId}
+		</if>
+		<if test="query.fileId != null and query.fileId != ''">
+			and v.file_id = #{query.fileId}
+		</if>
+		<if test="query.userId != null and query.userId != ''">
+			and v.user_id = #{query.userId}
+		</if>
+		<if test="query.postTime != null">
+			and v.post_time = #{query.postTime}
+		</if>
+		<if test="query.text != null and query.text != ''">
+			and v.text = #{query.text}
+		</if>
+		<if test="query.mode != null">
+			and v.mode = #{query.mode}
+		</if>
+		<if test="query.color != null and query.color != ''">
+			and v.color = #{query.color}
+		</if>
+		<if test="query.time != null">
+			and v.time = #{query.time}
+		</if>
+	</sql>
+
+	<!--扩展查询条件-->
+	<sql id="base_query_condition_extend">
+        <if test="query.videoIdFuzzy != null and query.videoIdFuzzy != ''">
+            and v.video_id like concat('%', #{query.videoIdFuzzy}, '%')
+        </if>
+        <if test="query.fileIdFuzzy != null and query.fileIdFuzzy != ''">
+            and v.file_id like concat('%', #{query.fileIdFuzzy}, '%')
+        </if>
+        <if test="query.userIdFuzzy != null and query.userIdFuzzy != ''">
+            and v.user_id like concat('%', #{query.userIdFuzzy}, '%')
+        </if>
+        <if test="query.postTimeStart != null and query.postTimeStart != ''">
+            <![CDATA[ and v.post_time >= str_to_date(#{query.postTimeStart}, '%Y-%m-%d') ]]>
+        </if>
+        <if test="query.postTimeEnd != null and query.postTimeEnd != ''">
+            <![CDATA[ and v.post_time < date_sub(str_to_date(#{query.postTimeEnd}, '%Y-%m-%d'),interval -1 day) ]]>
+        </if>
+        <if test="query.textFuzzy != null and query.textFuzzy != ''">
+            and v.text like concat('%', #{query.textFuzzy}, '%')
+        </if>
+        <if test="query.colorFuzzy != null and query.colorFuzzy != ''">
+            and v.color like concat('%', #{query.colorFuzzy}, '%')
+        </if>
+        <if test="query.videoUserId != null and query.videoUserId != ''">
+            and vd.user_id = #{query.videoUserId}
+        </if>
+        <if test="query.videoNameFuzzy!= null and query.videoNameFuzzy != ''">
+            and vd.video_name like concat('%', #{query.videoNameFuzzy}, '%')
+        </if>
+    </sql>
+
+	<!--通用查询条件-->
+	<sql id="query_condition">
+		<where>
+			<include refid="base_query_condition"/>
+			<include refid="base_query_condition_extend"/>
+		</where>
+	</sql>
+
+	<!--查询列表-->
+	<select id="selectList" resultMap="base_result_map">
+        select
+        <include refid="base_column_list"/>
+        <if test="query.queryVideoInfo">
+            ,vd.video_name videoName,vd.video_cover videoCover,u.nick_name nickName
+        </if>
+        from video_danmu v
+        <if test="query.queryVideoInfo">
+            inner join video_info vd on v.video_id = vd.video_id
+            left join user_info u on v.user_id = u.user_id
+        </if>
+        <include refid="query_condition"/>
+        <if test="query.orderBy != null">
+            order by ${query.orderBy}
+        </if>
+        <if test="query.simplePage != null">
+            limit #{query.simplePage.start}, #{query.simplePage.end}
+        </if>
+    </select>
+
+	<!--查询数量-->
+	<select id="selectCount" resultType="java.lang.Integer">
+        select count(1) from video_danmu v
+        <if test="query.queryVideoInfo">
+            inner join video_info vd on v.video_id = vd.video_id
+        </if>
+        <include refid="query_condition"/>
+    </select>
+
+	<!--单条插入（匹配有值的字段）-->
+	<insert id="insert" parameterType="com.easylive.entity.po.VideoDanmu">
+		<selectKey keyProperty="bean.danmuId" resultType="Integer" order="AFTER">
+			select last_insert_id()
+		</selectKey>
+		insert into video_danmu
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.danmuId != null">
+				danmu_id,
+			</if>
+			<if test="bean.videoId != null">
+				video_id,
+			</if>
+			<if test="bean.fileId != null">
+				file_id,
+			</if>
+			<if test="bean.userId != null">
+				user_id,
+			</if>
+			<if test="bean.postTime != null">
+				post_time,
+			</if>
+			<if test="bean.text != null">
+				text,
+			</if>
+			<if test="bean.mode != null">
+				mode,
+			</if>
+			<if test="bean.color != null">
+				color,
+			</if>
+			<if test="bean.time != null">
+				time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.danmuId != null">
+				#{bean.danmuId},
+			</if>
+			<if test="bean.videoId != null">
+				#{bean.videoId},
+			</if>
+			<if test="bean.fileId != null">
+				#{bean.fileId},
+			</if>
+			<if test="bean.userId != null">
+				#{bean.userId},
+			</if>
+			<if test="bean.postTime != null">
+				#{bean.postTime},
+			</if>
+			<if test="bean.text != null">
+				#{bean.text},
+			</if>
+			<if test="bean.mode != null">
+				#{bean.mode},
+			</if>
+			<if test="bean.color != null">
+				#{bean.color},
+			</if>
+			<if test="bean.time != null">
+				#{bean.time},
+			</if>
+		</trim>
+	</insert>
+
+	<!--插入或更新（匹配有值的字段）-->
+	<insert id="insertOrUpdate" parameterType="com.easylive.entity.po.VideoDanmu">
+		insert into video_danmu
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.danmuId != null">
+				danmu_id,
+			</if>
+			<if test="bean.videoId != null">
+				video_id,
+			</if>
+			<if test="bean.fileId != null">
+				file_id,
+			</if>
+			<if test="bean.userId != null">
+				user_id,
+			</if>
+			<if test="bean.postTime != null">
+				post_time,
+			</if>
+			<if test="bean.text != null">
+				text,
+			</if>
+			<if test="bean.mode != null">
+				mode,
+			</if>
+			<if test="bean.color != null">
+				color,
+			</if>
+			<if test="bean.time != null">
+				time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.danmuId != null">
+				#{bean.danmuId},
+			</if>
+			<if test="bean.videoId != null">
+				#{bean.videoId},
+			</if>
+			<if test="bean.fileId != null">
+				#{bean.fileId},
+			</if>
+			<if test="bean.userId != null">
+				#{bean.userId},
+			</if>
+			<if test="bean.postTime != null">
+				#{bean.postTime},
+			</if>
+			<if test="bean.text != null">
+				#{bean.text},
+			</if>
+			<if test="bean.mode != null">
+				#{bean.mode},
+			</if>
+			<if test="bean.color != null">
+				#{bean.color},
+			</if>
+			<if test="bean.time != null">
+				#{bean.time},
+			</if>
+		</trim>
+		on duplicate key update 
+		<trim prefix="" suffix="" suffixOverrides=",">
+			<if test="bean.videoId != null">
+				video_id = values(video_id),
+			</if>
+			<if test="bean.fileId != null">
+				file_id = values(file_id),
+			</if>
+			<if test="bean.userId != null">
+				user_id = values(user_id),
+			</if>
+			<if test="bean.postTime != null">
+				post_time = values(post_time),
+			</if>
+			<if test="bean.text != null">
+				text = values(text),
+			</if>
+			<if test="bean.mode != null">
+				mode = values(mode),
+			</if>
+			<if test="bean.color != null">
+				color = values(color),
+			</if>
+			<if test="bean.time != null">
+				time = values(time),
+			</if>
+		</trim>
+	</insert>
+
+	<!--批量添加-->
+	<insert id="insertBatch" parameterType="com.easylive.entity.po.VideoDanmu">
+		insert into video_danmu (danmu_id, video_id, file_id, user_id, post_time, text, mode, color, time) values
+		<foreach collection="list" item="item" separator="," >
+			(#{item.danmuId}, #{item.videoId}, #{item.fileId}, #{item.userId}, #{item.postTime}, #{item.text}, #{item.mode}, #{item.color}, #{item.time})
+		</foreach>
+	</insert>
+
+	<!--批量添加或更新-->
+	<insert id="insertOrUpdateBatch" parameterType="com.easylive.entity.po.VideoDanmu">
+		insert into video_danmu (danmu_id, video_id, file_id, user_id, post_time, text, mode, color, time) values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.danmuId}, #{item.videoId}, #{item.fileId}, #{item.userId}, #{item.postTime}, #{item.text}, #{item.mode}, #{item.color}, #{item.time})
+		</foreach>
+		on duplicate key update 
+danmu_id = values(danmu_id), video_id = values(video_id), file_id = values(file_id), user_id = values(user_id), post_time = values(post_time), text = values(text), mode = values(mode), color = values(color), time = values(time)
+	</insert>
+
+	<!--根据DanmuId查询-->
+	<select id="selectByDanmuId" resultMap="base_result_map">
+		select <include refid="base_column_list"/> from video_danmu v where v.danmu_id = #{danmuId}
+	</select>
+
+	<!--根据DanmuId更新-->
+	<update id="updateByDanmuId" parameterType="com.easylive.entity.po.VideoDanmu">
+		update video_danmu
+		<set>
+			<if test="bean.danmuId != null">
+				danmu_id = #{bean.danmuId},
+			</if>
+			<if test="bean.videoId != null">
+				video_id = #{bean.videoId},
+			</if>
+			<if test="bean.fileId != null">
+				file_id = #{bean.fileId},
+			</if>
+			<if test="bean.userId != null">
+				user_id = #{bean.userId},
+			</if>
+			<if test="bean.postTime != null">
+				post_time = #{bean.postTime},
+			</if>
+			<if test="bean.text != null">
+				text = #{bean.text},
+			</if>
+			<if test="bean.mode != null">
+				mode = #{bean.mode},
+			</if>
+			<if test="bean.color != null">
+				color = #{bean.color},
+			</if>
+			<if test="bean.time != null">
+				time = #{bean.time},
+			</if>
+		</set>
+		where danmu_id = #{danmuId}
+	</update>
+
+	<!--根据DanmuId删除-->
+	<delete id="deleteByDanmuId">
+		delete from video_danmu where danmu_id = #{danmuId}
+	</delete>
+
+	<!--根据query条件修改-->
+	<update id="updateByQuery">
+		update video_danmu v
+		<set>
+			<if test="bean.danmuId != null">
+				v.danmu_id = #{bean.danmuId},
+			</if>
+			<if test="bean.videoId != null">
+				v.video_id = #{bean.videoId},
+			</if>
+			<if test="bean.fileId != null">
+				v.file_id = #{bean.fileId},
+			</if>
+			<if test="bean.userId != null">
+				v.user_id = #{bean.userId},
+			</if>
+			<if test="bean.postTime != null">
+				v.post_time = #{bean.postTime},
+			</if>
+			<if test="bean.text != null">
+				v.text = #{bean.text},
+			</if>
+			<if test="bean.mode != null">
+				v.mode = #{bean.mode},
+			</if>
+			<if test="bean.color != null">
+				v.color = #{bean.color},
+			</if>
+			<if test="bean.time != null">
+				v.time = #{bean.time},
+			</if>
+		</set>
+		<include refid="query_condition"/>
+	</update>
+
+	<!--根据query条件删除-->
+	<delete id="deleteByQuery">
+		delete from video_danmu v
+		<include refid="query_condition"/>
+	</delete>
+</mapper>

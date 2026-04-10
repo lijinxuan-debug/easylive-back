@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easylive.mappers.StatisticsInfoMapper">
+    <!--实体映射-->
+    <resultMap id="base_result_map" type="com.easylive.entity.po.StatisticsInfo">
+        <!-- 统计日期 -->
+        <result column="statistics_data" property="statisticsData"/>
+        <!-- 用户ID -->
+        <result column="user_id" property="userId"/>
+        <!-- 数据统计类型 -->
+        <result column="data_type" property="dataType"/>
+        <!-- 统计数量 -->
+        <result column="statistics_count" property="statisticsCount"/>
+    </resultMap>
+
+    <!--通用结果查询列-->
+    <sql id="base_column_list">
+        s
+        .
+        statistics_data
+        , s.user_id, s.data_type, s.statistics_count
+    </sql>
+
+    <!--基础查询条件-->
+    <sql id="base_query_condition">
+        <if test="query.statisticsData != null and query.statisticsData != ''">
+            and s.statistics_data = #{query.statisticsData}
+        </if>
+        <if test="query.userId != null and query.userId != ''">
+            and s.user_id = #{query.userId}
+        </if>
+        <if test="query.dataType != null">
+            and s.data_type = #{query.dataType}
+        </if>
+        <if test="query.statisticsCount != null">
+            and s.statistics_count = #{query.statisticsCount}
+        </if>
+    </sql>
+
+    <!--扩展查询条件-->
+    <sql id="base_query_condition_extend">
+        <if test="query.statisticsDataFuzzy != null and query.statisticsDataFuzzy != ''">
+            and s.statistics_data like concat('%', #{query.statisticsDataFuzzy}, '%')
+        </if>
+        <if test="query.userIdFuzzy != null and query.userIdFuzzy != ''">
+            and s.user_id like concat('%', #{query.userIdFuzzy}, '%')
+        </if>
+        <if test="query.statisticsDataStart != null">
+            <![CDATA[ and s.statistics_data >= #{query.statisticsDataStart} ]]>
+        </if>
+        <if test="query.statisticsDataEnd != null">
+            <![CDATA[ and s.statistics_data <=  #{query.statisticsDataEnd} ]]>
+        </if>
+    </sql>
+
+    <!--通用查询条件-->
+    <sql id="query_condition">
+        <where>
+            <include refid="base_query_condition"/>
+            <include refid="base_query_condition_extend"/>
+        </where>
+    </sql>
+
+    <!--查询列表-->
+    <select id="selectList" resultMap="base_result_map">
+        select
+        <include refid="base_column_list"/>
+        from statistics_info s
+        <include refid="query_condition"/>
+        <if test="query.orderBy != null">
+            order by ${query.orderBy}
+        </if>
+        <if test="query.simplePage != null">
+            limit #{query.simplePage.start}, #{query.simplePage.end}
+        </if>
+    </select>
+
+    <!--查询数量-->
+    <select id="selectCount" resultType="java.lang.Integer">
+        select count(1) from statistics_info s
+        <include refid="query_condition"/>
+    </select>
+
+    <!--单条插入（匹配有值的字段）-->
+    <insert id="insert" parameterType="com.easylive.entity.po.StatisticsInfo">
+        insert into statistics_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bean.statisticsData != null">
+                statistics_data,
+            </if>
+            <if test="bean.userId != null">
+                user_id,
+            </if>
+            <if test="bean.dataType != null">
+                data_type,
+            </if>
+            <if test="bean.statisticsCount != null">
+                statistics_count,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bean.statisticsData != null">
+                #{bean.statisticsData},
+            </if>
+            <if test="bean.userId != null">
+                #{bean.userId},
+            </if>
+            <if test="bean.dataType != null">
+                #{bean.dataType},
+            </if>
+            <if test="bean.statisticsCount != null">
+                #{bean.statisticsCount},
+            </if>
+        </trim>
+    </insert>
+
+    <!--插入或更新（匹配有值的字段）-->
+    <insert id="insertOrUpdate" parameterType="com.easylive.entity.po.StatisticsInfo">
+        insert into statistics_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bean.statisticsData != null">
+                statistics_data,
+            </if>
+            <if test="bean.userId != null">
+                user_id,
+            </if>
+            <if test="bean.dataType != null">
+                data_type,
+            </if>
+            <if test="bean.statisticsCount != null">
+                statistics_count,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bean.statisticsData != null">
+                #{bean.statisticsData},
+            </if>
+            <if test="bean.userId != null">
+                #{bean.userId},
+            </if>
+            <if test="bean.dataType != null">
+                #{bean.dataType},
+            </if>
+            <if test="bean.statisticsCount != null">
+                #{bean.statisticsCount},
+            </if>
+        </trim>
+        on duplicate key update
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="bean.statisticsCount != null">
+                statistics_count = values(statistics_count),
+            </if>
+        </trim>
+    </insert>
+
+    <!--批量添加-->
+    <insert id="insertBatch" parameterType="com.easylive.entity.po.StatisticsInfo">
+        insert into statistics_info (statistics_data, user_id, data_type, statistics_count) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.statisticsData}, #{item.userId}, #{item.dataType}, #{item.statisticsCount})
+        </foreach>
+    </insert>
+
+    <!--批量添加或更新-->
+    <insert id="insertOrUpdateBatch" parameterType="com.easylive.entity.po.StatisticsInfo">
+        insert into statistics_info (statistics_data, user_id, data_type, statistics_count) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.statisticsData}, #{item.userId}, #{item.dataType}, #{item.statisticsCount})
+        </foreach>
+        on duplicate key update
+        statistics_data = values(statistics_data), user_id = values(user_id), data_type = values(data_type),
+        statistics_count = values(statistics_count)
+    </insert>
+
+    <!--根据StatisticsDataAndUserIdAndDataType查询-->
+    <select id="selectByStatisticsDataAndUserIdAndDataType" resultMap="base_result_map">
+        select
+        <include refid="base_column_list"/>
+        from statistics_info s where s.statistics_data = #{statisticsData} and s.user_id = #{userId} and s.data_type =
+        #{dataType}
+    </select>
+
+    <!--根据StatisticsDataAndUserIdAndDataType更新-->
+    <update id="updateByStatisticsDataAndUserIdAndDataType" parameterType="com.easylive.entity.po.StatisticsInfo">
+        update statistics_info
+        <set>
+            <if test="bean.statisticsData != null">
+                statistics_data = #{bean.statisticsData},
+            </if>
+            <if test="bean.userId != null">
+                user_id = #{bean.userId},
+            </if>
+            <if test="bean.dataType != null">
+                data_type = #{bean.dataType},
+            </if>
+            <if test="bean.statisticsCount != null">
+                statistics_count = #{bean.statisticsCount},
+            </if>
+        </set>
+        where statistics_data = #{statisticsData} and user_id = #{userId} and data_type = #{dataType}
+    </update>
+
+    <!--根据StatisticsDataAndUserIdAndDataType删除-->
+    <delete id="deleteByStatisticsDataAndUserIdAndDataType">
+        delete
+        from statistics_info
+        where statistics_data = #{statisticsData}
+          and user_id = #{userId}
+          and data_type = #{dataType}
+    </delete>
+
+    <!--根据query条件修改-->
+    <update id="updateByQuery">
+        update statistics_info s
+        <set>
+            <if test="bean.statisticsData != null">
+                s.statistics_data = #{bean.statisticsData},
+            </if>
+            <if test="bean.userId != null">
+                s.user_id = #{bean.userId},
+            </if>
+            <if test="bean.dataType != null">
+                s.data_type = #{bean.dataType},
+            </if>
+            <if test="bean.statisticsCount != null">
+                s.statistics_count = #{bean.statisticsCount},
+            </if>
+        </set>
+        <include refid="query_condition"/>
+    </update>
+
+    <!--根据query条件删除-->
+    <delete id="deleteByQuery">
+        delete from statistics_info s
+        <include refid="query_condition"/>
+    </delete>
+
+    <select id="selectFansCountByDate" resultType="com.easylive.entity.po.StatisticsInfo">
+        select focus_user_id userId, count(1) statisticsCount
+        from user_focus
+        where DATE_FORMAT(focus_time, '%Y-%m-%d') = #{date}
+        group by focus_user_id
+    </select>
+
+    <select id="selectCommentsCountByDate" resultType="com.easylive.entity.po.StatisticsInfo">
+        select video_user_id userId, count(1) statisticsCount
+        from video_comment
+        where DATE_FORMAT(post_time, '%Y-%m-%d') = #{date}
+        group by video_user_id
+    </select>
+
+    <select id="selectStatisticsInfoByDate" resultType="com.easylive.entity.po.StatisticsInfo">
+        select video_user_id userId, action_type dataType, action_count actionCount,count(1) statisticsCount
+        from user_action
+        where DATE_FORMAT(action_time, '%Y-%m-%d') = #{date}
+        <if test="actionArray != null and actionArray.length > 0">
+            and action_type in
+            <foreach collection="actionArray" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        group by video_user_id, action_type,action_count
+    </select>
+
+    <select id="selectDanmuCountByDate" resultType="com.easylive.entity.po.StatisticsInfo">
+        select u.user_id userId, count(1) statisticsCount
+        from video_danmu d
+                 left join video_info v on d.video_id = v.video_id
+                 left join user_info u on v.user_id = u.user_id
+        where DATE_FORMAT(post_time, '%Y-%m-%d') = #{date}
+        group by u.user_id
+    </select>
+
+    <select id="selectTotalCount" resultType="java.util.Map">
+        select
+        ifnull(sum(play_count), 0) playCount,
+        ifnull(sum(like_count), 0) likeCount,
+        ifnull(sum(danmu_count), 0) danmuCount,
+        ifnull(sum(comment_count), 0) commentCount,
+        ifnull(sum(coin_count), 0) coinCount,
+        ifnull(sum(collect_count), 0) collectCount
+        from video_info
+        <where>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectStatisticsTotalInfoByQuery" resultType="com.easylive.entity.po.StatisticsInfo">
+        select ifnull(sum(s.statistics_count),0) statisticsCount,s.data_type dataType,s.statistics_data statisticsData
+        from statistics_info s
+        <include refid="query_condition"/>
+        group by s.data_type,s.statistics_data
+    </select>
+
+    <select id="selectUserTotalInfo" resultType="com.easylive.entity.po.StatisticsInfo">
+        select count(1) statisticsCount, DATE_FORMAT(join_time, '%Y-%m-%d') statisticsData
+        from user_info
+        group by statisticsData
+        order by statisticsData asc
+    </select>
+</mapper>

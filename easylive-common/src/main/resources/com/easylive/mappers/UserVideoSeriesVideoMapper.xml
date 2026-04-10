@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easylive.mappers.UserVideoSeriesVideoMapper">
+	<!--实体映射-->
+	<resultMap id="base_result_map" type="com.easylive.entity.po.UserVideoSeriesVideo">
+		<!-- 列表ID -->
+		<result column="series_id" property="seriesId"/>
+		<!-- 视频ID -->
+		<result column="video_id" property="videoId"/>
+		<!-- 用户ID -->
+		<result column="user_id" property="userId"/>
+		<!-- 排序 -->
+		<result column="sort" property="sort"/>
+	</resultMap>
+
+	<!--通用结果查询列-->
+	<sql id="base_column_list">
+		u.series_id, u.video_id, u.user_id, u.sort
+	</sql>
+
+	<!--基础查询条件-->
+	<sql id="base_query_condition">
+		<if test="query.seriesId != null">
+			and u.series_id = #{query.seriesId}
+		</if>
+		<if test="query.videoId != null and query.videoId != ''">
+			and u.video_id = #{query.videoId}
+		</if>
+		<if test="query.userId != null and query.userId != ''">
+			and u.user_id = #{query.userId}
+		</if>
+		<if test="query.sort != null">
+			and u.sort = #{query.sort}
+		</if>
+	</sql>
+
+	<!--扩展查询条件-->
+	<sql id="base_query_condition_extend">
+		<if test="query.videoIdFuzzy != null and query.videoIdFuzzy != ''">
+			and u.video_id like concat('%', #{query.videoIdFuzzy}, '%')
+		</if>
+		<if test="query.userIdFuzzy != null and query.userIdFuzzy != ''">
+			and u.user_id like concat('%', #{query.userIdFuzzy}, '%')
+		</if>
+	</sql>
+
+	<!--通用查询条件-->
+	<sql id="query_condition">
+		<where>
+			<include refid="base_query_condition"/>
+			<include refid="base_query_condition_extend"/>
+		</where>
+	</sql>
+
+	<!--查询列表-->
+	<select id="selectList" resultMap="base_result_map">
+		select
+		<include refid="base_column_list"/>
+		<if test="query.queryVideoInfo">
+			,v.video_cover videoCover, v.video_name videoName,v.play_count playCount,v.create_time createTime
+		</if>
+		from user_video_series_video u
+		<if test="query.queryVideoInfo">
+			inner join video_info v on u.video_id = v.video_id
+		</if>
+		<include refid="query_condition"/>
+		<if test="query.orderBy != null">
+			order by ${query.orderBy}
+		</if>
+		<if test="query.simplePage != null">
+			limit #{query.simplePage.start}, #{query.simplePage.end}
+		</if>
+	</select>
+
+	<!--查询数量-->
+	<select id="selectCount" resultType="java.lang.Integer">
+		select count(1) from user_video_series_video u
+		<include refid="query_condition"/>
+	</select>
+
+	<!--单条插入（匹配有值的字段）-->
+	<insert id="insert" parameterType="com.easylive.entity.po.UserVideoSeriesVideo">
+		insert into user_video_series_video
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.seriesId != null">
+				series_id,
+			</if>
+			<if test="bean.videoId != null">
+				video_id,
+			</if>
+			<if test="bean.userId != null">
+				user_id,
+			</if>
+			<if test="bean.sort != null">
+				sort,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.seriesId != null">
+				#{bean.seriesId},
+			</if>
+			<if test="bean.videoId != null">
+				#{bean.videoId},
+			</if>
+			<if test="bean.userId != null">
+				#{bean.userId},
+			</if>
+			<if test="bean.sort != null">
+				#{bean.sort},
+			</if>
+		</trim>
+	</insert>
+
+	<!--插入或更新（匹配有值的字段）-->
+	<insert id="insertOrUpdate" parameterType="com.easylive.entity.po.UserVideoSeriesVideo">
+		insert into user_video_series_video
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.seriesId != null">
+				series_id,
+			</if>
+			<if test="bean.videoId != null">
+				video_id,
+			</if>
+			<if test="bean.userId != null">
+				user_id,
+			</if>
+			<if test="bean.sort != null">
+				sort,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.seriesId != null">
+				#{bean.seriesId},
+			</if>
+			<if test="bean.videoId != null">
+				#{bean.videoId},
+			</if>
+			<if test="bean.userId != null">
+				#{bean.userId},
+			</if>
+			<if test="bean.sort != null">
+				#{bean.sort},
+			</if>
+		</trim>
+		on duplicate key update 
+		<trim prefix="" suffix="" suffixOverrides=",">
+			<if test="bean.userId != null">
+				user_id = values(user_id),
+			</if>
+			<if test="bean.sort != null">
+				sort = values(sort),
+			</if>
+		</trim>
+	</insert>
+
+	<!--批量添加-->
+	<insert id="insertBatch" parameterType="com.easylive.entity.po.UserVideoSeriesVideo">
+		insert into user_video_series_video (series_id, video_id, user_id, sort) values
+		<foreach collection="list" item="item" separator="," >
+			(#{item.seriesId}, #{item.videoId}, #{item.userId}, #{item.sort})
+		</foreach>
+	</insert>
+
+	<!--批量添加或更新-->
+	<insert id="insertOrUpdateBatch" parameterType="com.easylive.entity.po.UserVideoSeriesVideo">
+		insert into user_video_series_video (series_id, video_id, user_id, sort) values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.seriesId}, #{item.videoId}, #{item.userId}, #{item.sort})
+		</foreach>
+		on duplicate key update 
+series_id = values(series_id), video_id = values(video_id), user_id = values(user_id), sort = values(sort)
+	</insert>
+
+	<!--根据SeriesIdAndVideoId查询-->
+	<select id="selectBySeriesIdAndVideoId" resultMap="base_result_map">
+		select <include refid="base_column_list"/> from user_video_series_video u where u.series_id = #{seriesId} and u.video_id = #{videoId}
+	</select>
+
+    <!--根据SeriesIdAndVideoId更新-->
+	<update id="updateBySeriesIdAndVideoId" parameterType="com.easylive.entity.po.UserVideoSeriesVideo">
+		update user_video_series_video
+		<set>
+			<if test="bean.seriesId != null">
+				series_id = #{bean.seriesId},
+			</if>
+			<if test="bean.videoId != null">
+				video_id = #{bean.videoId},
+			</if>
+			<if test="bean.userId != null">
+				user_id = #{bean.userId},
+			</if>
+			<if test="bean.sort != null">
+				sort = #{bean.sort},
+			</if>
+		</set>
+		where series_id = #{seriesId} and video_id = #{videoId}
+	</update>
+
+	<!--根据SeriesIdAndVideoId删除-->
+	<delete id="deleteBySeriesIdAndVideoId">
+		delete from user_video_series_video where series_id = #{seriesId} and video_id = #{videoId}
+	</delete>
+
+	<!--根据query条件修改-->
+	<update id="updateByQuery">
+		update user_video_series_video u
+		<set>
+			<if test="bean.seriesId != null">
+				u.series_id = #{bean.seriesId},
+			</if>
+			<if test="bean.videoId != null">
+				u.video_id = #{bean.videoId},
+			</if>
+			<if test="bean.userId != null">
+				u.user_id = #{bean.userId},
+			</if>
+			<if test="bean.sort != null">
+				u.sort = #{bean.sort},
+			</if>
+		</set>
+		<include refid="query_condition"/>
+	</update>
+
+	<!--根据query条件删除-->
+	<delete id="deleteByQuery">
+		delete from user_video_series_video u
+		<include refid="query_condition"/>
+	</delete>
+
+	<select id="selectMaxSort" resultType="java.lang.Integer">
+        select ifnull(max(sort), 0)
+        from user_video_series_video
+        where series_id = #{seriesId}
+    </select>
+</mapper>
