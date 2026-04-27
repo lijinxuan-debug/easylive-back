@@ -84,6 +84,9 @@ public class Constants {
 
     public static final Integer TWO = 2;
 
+    public static final Integer FIVE = 5;
+
+
     // 视频在线
     //"easylive:video:play:online:"
     public static final String REDIS_KEY_VIDEO_PLAY_COUNT_ONLINE_PREFIX = REDIS_KEY_PREFIX + "video:play:online:";

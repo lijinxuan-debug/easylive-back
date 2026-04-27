@@ -4,7 +4,6 @@ import com.easylive.component.EsSearchComponent;
 import com.easylive.component.RedisComponent;
 import com.easylive.entity.constants.Constants;
 import com.easylive.entity.dto.VideoPlayInfoDto;
-import com.easylive.entity.po.VideoInfo;
 import com.easylive.entity.po.VideoInfoFilePost;
 import com.easylive.enums.SearchOrderTypeEnum;
 import com.easylive.service.VideoInfoPostService;
@@ -13,7 +12,6 @@ import com.easylive.service.VideoPlayHistoryService;
 import com.easylive.utils.StringTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.concurrent.ExecutorService;
@@ -30,6 +28,8 @@ import java.util.concurrent.TimeUnit;
 public class ExecuteQueueTask {
 
     private ExecutorService executorService = Executors.newFixedThreadPool(Constants.TWO);
+
+    private ExecutorService playExecutorService = Executors.newFixedThreadPool(Constants.FIVE);
 
     @Resource
     private RedisComponent redisComponent;
@@ -72,7 +72,8 @@ public class ExecuteQueueTask {
 
     @PostConstruct
     public void consumVideoPlayInfoQueue() {
-        executorService.execute(() -> {
+        log.info("视频播放信息队列消费任务启动");
+        playExecutorService.execute(() -> {
             while (true) {
                 try {
                     VideoPlayInfoDto videoPlayInfoDto = redisComponent.getVideoPlayInfoQueue();
@@ -80,6 +81,7 @@ public class ExecuteQueueTask {
                         TimeUnit.SECONDS.sleep(2);
                         continue;
                     }
+                    log.debug("处理视频播放信息，videoId: {}, userId: {}", videoPlayInfoDto.getVideoId(), videoPlayInfoDto.getUserId());
                     videoInfoService.addReadCount(videoPlayInfoDto.getVideoId());
                     if (!StringTools.isEmpty(videoPlayInfoDto.getUserId())) {
                         videoPlayHistoryService.saveVideoPlayHistory(videoPlayInfoDto.getUserId(), videoPlayInfoDto.getVideoId(), videoPlayInfoDto.getFileIndex());
@@ -89,6 +91,7 @@ public class ExecuteQueueTask {
 
                     //更新es播放数量
                     esSearchComponent.updateDocCount(videoPlayInfoDto.getVideoId(), SearchOrderTypeEnum.VIDEO_PLAY.getField(), 1);
+                    log.debug("视频播放信息处理完成，videoId: {}", videoPlayInfoDto.getVideoId());
                 } catch (Exception e) {
                     log.error("获取转码文件传输队列失败", e);
                 }

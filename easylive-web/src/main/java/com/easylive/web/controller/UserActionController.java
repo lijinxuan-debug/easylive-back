@@ -41,7 +41,10 @@ public class UserActionController extends ABaseController {
         userAction.setActionType(actionType);
         actionCount = actionCount == null ? Constants.ONE : actionCount;
         userAction.setActionCount(actionCount);
+        log.info("收到用户操作请求 - userId: {}, videoId: {}, actionType: {}, commentId: {}, actionCount: {}",
+                userAction.getUserId(), videoId, actionType, commentId, actionCount);
         userActionService.saveAction(userAction);
+        log.info("用户操作处理完成 - userId: {}, videoId: {}, actionType: {}", userAction.getUserId(), videoId, actionType);
         return getSuccessResponseVo(null);
     }
 }

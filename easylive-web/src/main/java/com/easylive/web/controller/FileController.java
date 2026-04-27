@@ -161,11 +161,18 @@ public class FileController extends ABaseController {
 
     @RequestMapping("/videoResource/{fileId}")
     public void videoResource(HttpServletResponse response, @PathVariable("fileId") @NotEmpty String fileId) {
+        log.debug("开始处理视频播放请求，fileId: {}", fileId);
         VideoInfoFile videoInfoFile = videoInfoFileService.getVideoInfoFileByFileId(fileId);
+        if (videoInfoFile == null) {
+            log.error("视频文件不存在，fileId: {}", fileId);
+            return;
+        }
+        log.debug("找到视频文件，videoId: {}, filePath: {}", videoInfoFile.getVideoId(), videoInfoFile.getFilePath());
         String filePath = videoInfoFile.getFilePath();
         readFile(response, filePath + "/" + Constants.M3U8_NAME);
 
         //更新视频阅读信息
+        log.debug("准备保存播放信息，videoId: {}", videoInfoFile.getVideoId());
         VideoPlayInfoDto videoPlayInfoDto = new VideoPlayInfoDto();
         videoPlayInfoDto.setVideoId(videoInfoFile.getVideoId());
         videoPlayInfoDto.setFileIndex(videoInfoFile.getFileIndex());
@@ -175,6 +182,7 @@ public class FileController extends ABaseController {
             videoPlayInfoDto.setUserId(userInfoDto.getUserId());
         }
         redisComponent.saveVideoPlayInfo(videoPlayInfoDto);
+        log.debug("播放信息已保存到Redis队列，videoId: {}", videoInfoFile.getVideoId());
     }
 
     @RequestMapping("/videoResource/{fileId}/{ts}")

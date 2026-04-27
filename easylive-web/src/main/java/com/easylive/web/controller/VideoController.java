@@ -97,6 +97,7 @@ public class VideoController extends ABaseController {
             userActionQuery.setUserId(tokenUserInfoDto.getUserId());
             userActionQuery.setActionTypeArray(new Integer[]{UserActionTypeEnum.VIDEO_LIKE.getType(),
                     UserActionTypeEnum.VIDEO_COLLECT.getType(), UserActionTypeEnum.VIDEO_COIN.getType()});
+            userActionQuery.setCommentId(Constants.ZERO);
             userActionList = userActionService.findListByParam(userActionQuery);
         }
 
