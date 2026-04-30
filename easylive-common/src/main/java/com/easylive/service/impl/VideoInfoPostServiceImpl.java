@@ -358,6 +358,8 @@ public class VideoInfoPostServiceImpl implements VideoInfoPostService {
         }
         // mp4文件-> .ts文件+.m3u8索引文件
         ffmpegUtils.convertVideo2Ts(tsFolder, completeVideo);
+        // 生成预览雪碧图
+        ffmpegUtils.createVideoVtt(completeVideo, tsFolder.getPath());
         videoFile.delete();
     }
 

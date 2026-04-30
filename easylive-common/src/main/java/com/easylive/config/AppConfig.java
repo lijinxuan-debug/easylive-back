@@ -29,6 +29,13 @@ public class AppConfig {
     @Value("${es.index.video.name:easylive_video}")
     private String esIndexVideoName;
 
+    @Value("${app.domain}")
+    private String appDomain;
+
+    public String getAppDomain() {
+        return appDomain;
+    }
+
     public String getEsIndexVideoName() {
         return esIndexVideoName;
     }

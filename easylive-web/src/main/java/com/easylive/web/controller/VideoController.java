@@ -2,8 +2,10 @@ package com.easylive.web.controller;
 
 import com.easylive.component.EsSearchComponent;
 import com.easylive.component.RedisComponent;
+import com.easylive.config.AppConfig;
 import com.easylive.entity.constants.Constants;
 import com.easylive.entity.dto.TokenUserInfoDto;
+import com.easylive.entity.dto.VideoPreviewDto;
 import com.easylive.entity.po.UserAction;
 import com.easylive.entity.po.VideoInfo;
 import com.easylive.entity.po.VideoInfoFile;
@@ -43,6 +45,9 @@ import java.util.stream.Collectors;
 @Validated
 @Slf4j
 public class VideoController extends ABaseController {
+
+    @Resource
+    private AppConfig appConfig;
 
     @Resource
     private VideoInfoService videoInfoService;
@@ -104,7 +109,33 @@ public class VideoController extends ABaseController {
         VideoInfoResultVo videoInfoResultVo = new VideoInfoResultVo();
         videoInfoResultVo.setVideoInfo(videoInfo);
         videoInfoResultVo.setUserActionList(userActionList);
+        // 只有当视频已经转码成功（或者你有预览图逻辑时）才创建
+        if (videoInfo.getDuration() != null && videoInfo.getDuration() > 0) {
+            VideoPreviewDto previewDto = getVideoPreviewDto(videoId, videoInfo);
+
+            videoInfoResultVo.setPreviewConfig(previewDto);
+        }
+
         return getSuccessResponseVo(videoInfoResultVo);
+    }
+
+    private VideoPreviewDto getVideoPreviewDto(String videoId, VideoInfo videoInfo) {
+        VideoPreviewDto previewDto = new VideoPreviewDto();
+
+        VideoInfoFileQuery videoInfoFileQuery = new VideoInfoFileQuery();
+        videoInfoFileQuery.setVideoId(videoId);
+        videoInfoFileQuery.setOrderBy("v.file_index asc");
+
+        // 注意：videoInfo.getFilePath() 已经包含了 "video/202Xxx/..." 这一层
+        String previewUrl = appConfig.getAppDomain() + "/file/videoResource/"
+                + videoInfoFileQuery.getFilePath() + "/" + Constants.VIDEO_PREVIEW_NAME;
+
+        previewDto.setUrl(previewUrl);
+
+        // 计算间隔 (必须强转 double)
+        double interval = (double) videoInfo.getDuration() / previewDto.getTotal();
+        previewDto.setInterval(interval);
+        return previewDto;
     }
 
     @RequestMapping("/loadVideoPList")

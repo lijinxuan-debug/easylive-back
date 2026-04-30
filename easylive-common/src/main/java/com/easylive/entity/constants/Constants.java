@@ -32,6 +32,8 @@ public class Constants {
 
     public static final String IMAGE_THUMBNAIL_SUFFIX = "_thumbnail.jpg";
 
+    public static final String VIDEO_PREVIEW_NAME = "preview.jpg";
+
     public static final String REDIS_KEY_UPLOADING_FILE = REDIS_KEY_PREFIX + "uploading:";
 
     public static final String REDIS_KEY_SYS_SETTING = REDIS_KEY_PREFIX + "sysSetting:";

@@ -49,3 +49,5 @@ log:
 admin:
   account: admin
   password: admin123
+app:
+  domain: http://192.168.21.129:7071

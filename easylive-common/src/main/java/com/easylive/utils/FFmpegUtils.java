@@ -69,6 +69,21 @@ public class FFmpegUtils {
         ProcessUtils.executeCommand(cmd, appConfig.getShowFFmpegLog());
     }
 
+    public void createVideoVtt(String videoFilePath, String tsFolderPath) {
+        Integer duration = getVideoInfoDuration(videoFilePath);
+        if (duration <= 0) return;
+
+        // 总张数定为 400，安全又清晰
+        double totalImages = 400.0;
+        double fps = totalImages / duration;
+
+        // 10列，40行
+        String CMD = "ffmpeg -i \"%s\" -vf \"fps=%.6f,scale=160:90,tile=10x40\" -an -vsync vfr \"%s\" -y";
+
+        String cmd = String.format(CMD, videoFilePath, fps, tsFolderPath + "/" + Constants.VIDEO_PREVIEW_NAME);
+        ProcessUtils.executeCommand(cmd, appConfig.getShowFFmpegLog());
+    }
+
     // 转换视频编码格式
     public void convertVideo2Ts(File tsFolder, String videoFilePath) {
         final String CMD_TRANSFER_2TS = "ffmpeg -y -i \"%s\"  -vcodec copy -acodec copy -bsf:v h264_mp4toannexb \"%s\"";
