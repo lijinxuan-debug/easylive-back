@@ -16,6 +16,9 @@ public class Constants {
 
     public static final String M3U8_NAME = "index.m3u8";
 
+    /** 短视频 MP4 直链（Android 精确 seek，避免 HLS/TS 内 10s 关键帧吸附） */
+    public static final String PLAY_MP4_NAME = "play.mp4";
+
     public static final String PASSWORD_REGEX = "^(?=.*\\d)(?=.*[a-zA-Z])[\\da-zA-Z~!@#$%^&*_]{8,18}$";
 
     public static final String REDIS_KEY_PREFIX = "easylive:";
@@ -98,6 +101,12 @@ public class Constants {
     public static final String REDIS_KEY_VIDEO_PLAY_COUNT_USER_PREFIX = "user:";
     //"easylive:video:play:online:user:"
     public static final String REDIS_KEY_VIDEO_PLAY_COUNT_USER = REDIS_KEY_VIDEO_PLAY_COUNT_ONLINE_PREFIX + REDIS_KEY_VIDEO_PLAY_COUNT_USER_PREFIX + "%s:%s";
+
+    /** 新用户注册时的默认个人简介 */
+    public static final String DEFAULT_PERSONAL_INTRODUCTION = "这个家伙很懒，什么也没留下";
+
+    /** 新用户注册时的默认学校 */
+    public static final String DEFAULT_SCHOOL = "门头沟学院";
 
 
 }

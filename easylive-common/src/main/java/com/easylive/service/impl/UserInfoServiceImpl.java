@@ -187,6 +187,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         userInfo.setJoinTime(new Date());
         userInfo.setStatus(UserStatusEnum.ENABLE.getCode());
         userInfo.setTheme(Constants.ONE);
+        userInfo.setPersonalIntroduction(Constants.DEFAULT_PERSONAL_INTRODUCTION);
+        userInfo.setSchool(Constants.DEFAULT_SCHOOL);
+        userInfo.setBirthday("");
 
         SysSettingDto sysSetting = redisComponent.getSysSetting();
         userInfo.setCurrentCoinCount(sysSetting.getRegisterCoinCount());

@@ -340,27 +340,20 @@ public class VideoInfoPostServiceImpl implements VideoInfoPostService {
     }
 
     // 我们只要h264（mp4），不要hevc
-    private void convertVideo2Ts(String completeVideo) {
+    private Integer convertVideo2Ts(String completeVideo) {
         File videoFile = new File(completeVideo);
         File tsFolder = videoFile.getParentFile();
-        // 获取文件编码格式
         String codec = ffmpegUtils.getVideoCodec(completeVideo);
-        // 保证格式：只有和h264的可以
         if (Constants.VIDEO_CODE_HEVC.equals(codec)) {
-            // 生成一个临时文件名
             String tempFileName = completeVideo + Constants.VIDEO_CODE_TEMP_FILE_SUFFIX;
-            // 重命名文件为临时文件名
             new File(completeVideo).renameTo(new File(tempFileName));
-            // 将HEVC格式的文件转换为MP4格式
             ffmpegUtils.convertHevc2Mp4(tempFileName, completeVideo);
-            // 删除临时文件
             new File(tempFileName).delete();
         }
-        // mp4文件-> .ts文件+.m3u8索引文件
-        ffmpegUtils.convertVideo2Ts(tsFolder, completeVideo);
-        // 生成预览雪碧图
+        Integer duration = ffmpegUtils.convertVideo2TsAndGetDuration(tsFolder, completeVideo);
         ffmpegUtils.createVideoVtt(completeVideo, tsFolder.getPath());
         videoFile.delete();
+        return duration;
     }
 
     // 分片->.mp4文件 合并分片

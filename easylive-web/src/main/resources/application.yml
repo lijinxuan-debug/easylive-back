@@ -44,4 +44,4 @@ log:
   root:
     level: debug
 app:
-  domain: http://192.168.21.129:7071
+  domain: http://192.168.23.81:7071

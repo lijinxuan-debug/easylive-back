@@ -125,10 +125,17 @@ public class VideoController extends ABaseController {
         VideoInfoFileQuery videoInfoFileQuery = new VideoInfoFileQuery();
         videoInfoFileQuery.setVideoId(videoId);
         videoInfoFileQuery.setOrderBy("v.file_index asc");
+        List<VideoInfoFile> videoInfoFileList = videoInfoFileService.findListByParam(videoInfoFileQuery);
 
-        // 注意：videoInfo.getFilePath() 已经包含了 "video/202Xxx/..." 这一层
-        String previewUrl = appConfig.getAppDomain() + "/file/videoResource/"
-                + videoInfoFileQuery.getFilePath() + "/" + Constants.VIDEO_PREVIEW_NAME;
+        if (videoInfoFileList == null || videoInfoFileList.isEmpty()) {
+            previewDto.setUrl("");
+            previewDto.setInterval(0);
+            return previewDto;
+        }
+
+        // 获取第一个文件的 fileId
+        String fileId = videoInfoFileList.get(0).getFileId();
+        String previewUrl = appConfig.getAppDomain() + "/file/videoPreview/" + fileId;
 
         previewDto.setUrl(previewUrl);
 

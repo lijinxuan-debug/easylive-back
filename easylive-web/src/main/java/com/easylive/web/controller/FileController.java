@@ -26,7 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.catalina.connector.ClientAbortException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.File;
@@ -71,21 +76,87 @@ public class FileController extends ABaseController {
     }
 
     protected void readFile(HttpServletResponse response, String filePath) {
+        HttpServletRequest request = null;
+        RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
+        if (attrs instanceof ServletRequestAttributes) {
+            request = ((ServletRequestAttributes) attrs).getRequest();
+        }
+        readFile(request, response, filePath);
+    }
+
+    protected void readFile(HttpServletRequest request, HttpServletResponse response, String filePath) {
         File file = new File(appConfig.getProjectFolder() + Constants.FILE_FOLDER + filePath);
         if (!file.exists()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
+        long fileLength = file.length();
+        long start = 0;
+        long end = fileLength - 1;
+        String range = request != null ? request.getHeader("Range") : null;
+        if (range != null && range.startsWith("bytes=")) {
+            String[] parts = range.substring(6).split("-", 2);
+            try {
+                start = Long.parseLong(parts[0].trim());
+                if (parts.length > 1 && !parts[1].isEmpty()) {
+                    end = Long.parseLong(parts[1].trim());
+                }
+            } catch (NumberFormatException ignored) {
+                start = 0;
+                end = fileLength - 1;
+            }
+            if (end >= fileLength) {
+                end = fileLength - 1;
+            }
+            if (start > end || start < 0) {
+                response.setStatus(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+                response.setHeader("Content-Range", "bytes */" + fileLength);
+                return;
+            }
+            response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+            response.setHeader("Content-Range", "bytes " + start + "-" + end + "/" + fileLength);
+        }
+        long contentLength = end - start + 1;
+        response.setHeader("Accept-Ranges", "bytes");
+        response.setContentLengthLong(contentLength);
         try (OutputStream outputStream = response.getOutputStream();
              FileInputStream inputStream = new FileInputStream(file)) {
-            byte[] buffer = new byte[1024];
-            int len = 0;
-            while ((len = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, len);
+            long skipped = inputStream.skip(start);
+            if (skipped < start) {
+                return;
+            }
+            byte[] buffer = new byte[8192];
+            long remaining = contentLength;
+            while (remaining > 0) {
+                int read = inputStream.read(buffer, 0, (int) Math.min(buffer.length, remaining));
+                if (read == -1) {
+                    break;
+                }
+                outputStream.write(buffer, 0, read);
+                remaining -= read;
             }
             outputStream.flush();
         } catch (IOException e) {
-            log.error("读取文件失败", e);
+            if (isClientAbort(e)) {
+                log.debug("客户端中断下载(正常): {}", filePath);
+            } else {
+                log.error("读取文件失败: {}", filePath, e);
+            }
         }
+    }
+
+    private boolean isClientAbort(Throwable e) {
+        while (e != null) {
+            if (e instanceof ClientAbortException) {
+                return true;
+            }
+            String msg = e.getMessage();
+            if (msg != null && (msg.contains("Broken pipe") || msg.contains("Connection reset"))) {
+                return true;
+            }
+            e = e.getCause();
+        }
+        return false;
     }
 
     //文件预上传
@@ -170,13 +241,33 @@ public class FileController extends ABaseController {
         log.debug("找到视频文件，videoId: {}, filePath: {}", videoInfoFile.getVideoId(), videoInfoFile.getFilePath());
         String filePath = videoInfoFile.getFilePath();
         readFile(response, filePath + "/" + Constants.M3U8_NAME);
+        enqueueVideoPlayInfo(videoInfoFile);
+    }
 
-        //更新视频阅读信息
+    @RequestMapping("/videoResource/{fileId}/{ts}")
+    public void videoResourceTs(HttpServletResponse response, @PathVariable("fileId") @NotEmpty String fileId, @PathVariable("ts") @NotEmpty String ts) {
+        VideoInfoFile videoInfoFile = videoInfoFileService.getVideoInfoFileByFileId(fileId);
+        if (videoInfoFile == null) {
+            return;
+        }
+        String filePath = videoInfoFile.getFilePath();
+        // Android/Exo 等客户端拉取 index.m3u8 走此接口，需同样计入播放量
+        if (Constants.M3U8_NAME.equals(ts)) {
+            enqueueVideoPlayInfo(videoInfoFile);
+        }
+        if (ts.endsWith(".mp4")) {
+            response.setContentType("video/mp4");
+            response.setHeader("Cache-Control", "max-age=3600");
+        }
+        readFile(response, filePath + "/" + ts);
+    }
+
+    /** 播放量：写入 Redis 队列，由 ExecuteQueueTask 异步 addReadCount */
+    private void enqueueVideoPlayInfo(VideoInfoFile videoInfoFile) {
         log.debug("准备保存播放信息，videoId: {}", videoInfoFile.getVideoId());
         VideoPlayInfoDto videoPlayInfoDto = new VideoPlayInfoDto();
         videoPlayInfoDto.setVideoId(videoInfoFile.getVideoId());
         videoPlayInfoDto.setFileIndex(videoInfoFile.getFileIndex());
-
         TokenUserInfoDto userInfoDto = getTokenUserInfoFromCookie();
         if (userInfoDto != null) {
             videoPlayInfoDto.setUserId(userInfoDto.getUserId());
@@ -185,10 +276,15 @@ public class FileController extends ABaseController {
         log.debug("播放信息已保存到Redis队列，videoId: {}", videoInfoFile.getVideoId());
     }
 
-    @RequestMapping("/videoResource/{fileId}/{ts}")
-    public void videoResourceTs(HttpServletResponse response, @PathVariable("fileId") @NotEmpty String fileId, @PathVariable("ts") @NotEmpty String ts) {
+    @RequestMapping("/videoPreview/{fileId}")
+    public void videoPreview(HttpServletResponse response, @PathVariable("fileId") @NotEmpty String fileId) {
         VideoInfoFile videoInfoFile = videoInfoFileService.getVideoInfoFileByFileId(fileId);
+        if (videoInfoFile == null) {
+            return;
+        }
         String filePath = videoInfoFile.getFilePath();
-        readFile(response, filePath + "/" + ts);
+        response.setContentType("image/jpeg");
+        response.setHeader("Cache-Control", "max-age=2592000");
+        readFile(response, filePath + "/" + Constants.VIDEO_PREVIEW_NAME);
     }
 }

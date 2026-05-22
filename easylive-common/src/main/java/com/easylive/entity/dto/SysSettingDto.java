@@ -16,8 +16,8 @@ public class SysSettingDto implements Serializable {
     private Integer registerCoinCount = 10;
     // 发布视频赠送币数
     private Integer postVideoCoinCount = 5;
-    // 单个视频大小
-    private Integer videoSize = 100;
+    // 单个视频大小（MB），默认 1GB
+    private Integer videoSize = 1024; // 1GB
     // 稿件最大分片数
     private Integer videoPCount = 10;
     private Integer videoCount = 10;

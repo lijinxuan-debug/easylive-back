@@ -123,6 +123,10 @@ public class RedisComponent {
         SysSettingDto sysSettingDto = (SysSettingDto) redisUtils.get(Constants.REDIS_KEY_SYS_SETTING);
         if (sysSettingDto == null) {
             sysSettingDto = new SysSettingDto();
+            saveSysSetting(sysSettingDto);
+        } else if (sysSettingDto.getVideoSize() == null || sysSettingDto.getVideoSize() < 1024) {
+            sysSettingDto.setVideoSize(1024);
+            saveSysSetting(sysSettingDto);
         }
         return sysSettingDto;
     }

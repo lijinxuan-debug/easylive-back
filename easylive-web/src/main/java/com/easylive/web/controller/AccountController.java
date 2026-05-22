@@ -58,7 +58,8 @@ public class AccountController extends ABaseController {
     }
 
     @RequestMapping("/register")
-    public ResponseVo register(@NotEmpty @Email @Size(max = 150) String email,
+    public ResponseVo register(HttpServletResponse response,
+                               @NotEmpty @Email @Size(max = 150) String email,
                                @NotEmpty @Size(max = 30) String nickName,
                                @NotEmpty @Pattern(regexp = Constants.PASSWORD_REGEX) String registerPassword,
                                @NotEmpty String checkCode,
@@ -68,7 +69,14 @@ public class AccountController extends ABaseController {
                 throw new BusinessException("图片验证码错误");
             }
             userInfoService.register(email, nickName, registerPassword);
-            return getSuccessResponseVo(null);
+            String ip = getIpAddr();
+            TokenUserInfoDto tokenUserInfoDto = userInfoService.login(
+                    email,
+                    StringTools.passwordMD5(registerPassword),
+                    ip
+            );
+            saveToken2Cookie(response, tokenUserInfoDto.getToken());
+            return getSuccessResponseVo(tokenUserInfoDto);
         } finally {
             // 清除redis中的验证码
             redisComponent.cleanCheckCode(checkCodeKey);
