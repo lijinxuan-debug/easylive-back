@@ -62,7 +62,7 @@ public class StatisticsController extends ABaseController {
     public ResponseVo getWeekStatisticsInfo(@NotNull Integer dataType) {
         TokenUserInfoDto tokenUserInfo = getTokenUserInfo();
 
-        List<String> weekDates = DateUtils.getBeforeDates(7);
+        List<String> weekDates = DateUtils.getRecentDatesIncludingToday(7);
 
         StatisticsInfoQuery statisticsInfoQuery = new StatisticsInfoQuery();
         statisticsInfoQuery.setUserId(tokenUserInfo.getUserId());

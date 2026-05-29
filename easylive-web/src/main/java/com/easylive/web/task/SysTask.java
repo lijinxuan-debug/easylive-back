@@ -17,7 +17,8 @@ public class SysTask {
     @Resource
     private StatisticsInfoService statisticsInfoService;
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    /** 每天 10:00 汇总昨日 statistics_info */
+    @Scheduled(cron = "0 0 10 * * ?")
     public void updateStatisticsInfo() {
         statisticsInfoService.updateStatisticsInfo();
     }

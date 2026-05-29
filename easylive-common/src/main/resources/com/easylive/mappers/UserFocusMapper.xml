@@ -64,6 +64,10 @@
             ,i.nick_name otherNickName, i.avatar otherAvatar,i.user_id otherUserId,i.personal_introduction
             otherPersonalIntroduction,(select count(1) from user_focus f where u.user_id = f.focus_user_id and
             u.focus_user_id = f.user_id) focusType
+            <if test="query.queryType == 1">
+                ,(select count(1) from user_focus f2 where f2.focus_user_id = i.user_id) otherFansCount
+                ,(select count(1) from video_info vi where vi.user_id = i.user_id) otherVideoCount
+            </if>
         </if>
         from user_focus u
         <if test="query.queryType == 0">

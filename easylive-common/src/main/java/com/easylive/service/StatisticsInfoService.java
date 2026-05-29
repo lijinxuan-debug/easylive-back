@@ -59,6 +59,11 @@ public interface StatisticsInfoService {
 
     void updateStatisticsInfo();
 
+    /**
+     * 实时累加当日统计（statistics_data = 今天）
+     */
+    void incrementStatistics(String userId, Integer dataType, int delta);
+
     Map<String, Integer> getActualTimeStatisticsInfo(String userId);
 
     List<StatisticsInfo> getStatisticsInfoByQuery(StatisticsInfoQuery query);

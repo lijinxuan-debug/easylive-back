@@ -41,4 +41,12 @@ public interface StatisticsInfoMapper<T, P> extends BaseMapper<T, P> {
 
     List<T> selectUserTotalInfo(@Param("query") P p);
 
+    /**
+     * 按天累加统计（用于交互后实时更新 statistics_info）
+     */
+    Integer incrementStatisticsCount(@Param("statisticsData") String statisticsData,
+                                     @Param("userId") String userId,
+                                     @Param("dataType") Integer dataType,
+                                     @Param("delta") Integer delta);
+
 }

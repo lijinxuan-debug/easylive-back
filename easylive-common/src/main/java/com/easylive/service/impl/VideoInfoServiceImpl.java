@@ -16,10 +16,12 @@ import com.easylive.entity.query.*;
 import com.easylive.entity.vo.PaginationResultVo;
 import com.easylive.enums.PageSizeEnum;
 import com.easylive.enums.ResponseEnum;
+import com.easylive.enums.StatisticsTypeEnum;
 import com.easylive.enums.UserActionTypeEnum;
 import com.easylive.enums.VideoRecommendTypeEnum;
 import com.easylive.exception.BusinessException;
 import com.easylive.mappers.*;
+import com.easylive.service.StatisticsInfoService;
 import com.easylive.service.VideoInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -64,6 +66,9 @@ public class VideoInfoServiceImpl implements VideoInfoService {
 
     @Resource
     private EsSearchComponent esSearchComponent;
+
+    @Resource
+    private StatisticsInfoService statisticsInfoService;
 
     @Resource
     private RedisComponent redisComponent;
@@ -215,7 +220,12 @@ public class VideoInfoServiceImpl implements VideoInfoService {
 
     @Override
     public void addReadCount(String videoId) {
+        VideoInfo videoInfo = videoInfoMapper.selectByVideoId(videoId);
+        if (videoInfo == null) {
+            return;
+        }
         videoInfoMapper.updateCountInfo(videoId, UserActionTypeEnum.VIDEO_PLAY.getField(), Constants.ONE);
+        statisticsInfoService.incrementStatistics(videoInfo.getUserId(), StatisticsTypeEnum.PLAY.getType(), Constants.ONE);
     }
 
     @Override

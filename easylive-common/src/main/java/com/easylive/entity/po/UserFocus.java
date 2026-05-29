@@ -38,6 +38,26 @@ public class UserFocus implements Serializable {
 
     private Integer focusType;
 
+    private Integer otherFansCount;
+
+    private Integer otherVideoCount;
+
+    public Integer getOtherFansCount() {
+        return otherFansCount;
+    }
+
+    public void setOtherFansCount(Integer otherFansCount) {
+        this.otherFansCount = otherFansCount;
+    }
+
+    public Integer getOtherVideoCount() {
+        return otherVideoCount;
+    }
+
+    public void setOtherVideoCount(Integer otherVideoCount) {
+        this.otherVideoCount = otherVideoCount;
+    }
+
     public String getOtherNickName() {
         return otherNickName;
     }

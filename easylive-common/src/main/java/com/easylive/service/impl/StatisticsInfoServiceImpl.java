@@ -126,6 +126,15 @@ public class StatisticsInfoServiceImpl implements StatisticsInfoService {
     }
 
     @Override
+    public void incrementStatistics(String userId, Integer dataType, int delta) {
+        if (StringTools.isEmpty(userId) || dataType == null || delta == 0) {
+            return;
+        }
+        String today = DateUtils.getBeforeDayDate(0);
+        statisticsInfoMapper.incrementStatisticsCount(today, userId, dataType, delta);
+    }
+
+    @Override
     public void updateStatisticsInfo() {
         List<StatisticsInfo> list = new ArrayList<>();
 

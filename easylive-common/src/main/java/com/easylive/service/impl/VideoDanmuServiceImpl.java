@@ -13,9 +13,11 @@ import com.easylive.entity.query.SimplePage;
 import com.easylive.enums.PageSizeEnum;
 import com.easylive.enums.ResponseEnum;
 import com.easylive.enums.SearchOrderTypeEnum;
+import com.easylive.enums.StatisticsTypeEnum;
 import com.easylive.enums.UserActionTypeEnum;
 import com.easylive.exception.BusinessException;
 import com.easylive.mappers.VideoInfoMapper;
+import com.easylive.service.StatisticsInfoService;
 import com.easylive.service.VideoDanmuService;
 import com.easylive.mappers.VideoDanmuMapper;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,9 @@ public class VideoDanmuServiceImpl implements VideoDanmuService {
 
     @Resource
     private EsSearchComponent esSearchComponent;
+
+    @Resource
+    private StatisticsInfoService statisticsInfoService;
 
     /**
      * 根据条件查询列表
@@ -126,6 +131,7 @@ public class VideoDanmuServiceImpl implements VideoDanmuService {
         videoDanmuMapper.insert(videoDanmu);
 
         videoInfoMapper.updateCountInfo(videoDanmu.getVideoId(), UserActionTypeEnum.VIDEO_DANMU.getField(), Constants.ONE);
+        statisticsInfoService.incrementStatistics(videoInfo.getUserId(), StatisticsTypeEnum.DANMU.getType(), Constants.ONE);
 
         //更新es弹幕
         esSearchComponent.updateDocCount(videoDanmu.getVideoId(), SearchOrderTypeEnum.VIDEO_DANMU.getField(), Constants.ONE);
@@ -145,6 +151,7 @@ public class VideoDanmuServiceImpl implements VideoDanmuService {
             throw new BusinessException(ResponseEnum.CODE_600);
         }
         videoDanmuMapper.deleteByDanmuId(danmuId);
+        statisticsInfoService.incrementStatistics(videoInfo.getUserId(), StatisticsTypeEnum.DANMU.getType(), -Constants.ONE);
         //更新es弹幕
         esSearchComponent.updateDocCount(videoDanmu.getVideoId(), SearchOrderTypeEnum.VIDEO_DANMU.getField(), -Constants.ONE);
     }

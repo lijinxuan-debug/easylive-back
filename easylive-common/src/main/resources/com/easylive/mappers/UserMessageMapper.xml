@@ -40,7 +40,13 @@
         <if test="query.videoId != null and query.videoId != ''">
             and u.video_id = #{query.videoId}
         </if>
-        <if test="query.messageType != null">
+        <if test="query.messageTypeArray != null and query.messageTypeArray.length > 0">
+            and u.message_type in
+            <foreach collection="query.messageTypeArray" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="(query.messageTypeArray == null or query.messageTypeArray.length == 0) and query.messageType != null">
             and u.message_type = #{query.messageType}
         </if>
         <if test="query.sendUserId != null and query.sendUserId != ''">
@@ -76,6 +82,16 @@
         </if>
         <if test="query.extendJsonFuzzy != null and query.extendJsonFuzzy != ''">
             and u.extend_json like concat('%', #{query.extendJsonFuzzy}, '%')
+        </if>
+        <if test="query.replyOnly != null and query.replyOnly == 1">
+            and u.extend_json like '%messageContentReply%'
+            and u.extend_json not like '%"messageContentReply":null%'
+            and u.extend_json not like '%"messageContentReply":""%'
+        </if>
+        <if test="query.atMeOnly != null and query.atMeOnly == 1">
+            <if test="query.atMeKeyword != null and query.atMeKeyword != ''">
+                and u.extend_json like concat('%', #{query.atMeKeyword}, '%')
+            </if>
         </if>
     </sql>
 

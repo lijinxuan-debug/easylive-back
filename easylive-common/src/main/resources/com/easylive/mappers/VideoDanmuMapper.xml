@@ -103,7 +103,7 @@
         select
         <include refid="base_column_list"/>
         <if test="query.queryVideoInfo">
-            ,vd.video_name videoName,vd.video_cover videoCover,u.nick_name nickName
+            ,vd.video_name videoName,vd.video_cover videoCover,u.nick_name nickName,u.avatar avatar
         </if>
         from video_danmu v
         <if test="query.queryVideoInfo">

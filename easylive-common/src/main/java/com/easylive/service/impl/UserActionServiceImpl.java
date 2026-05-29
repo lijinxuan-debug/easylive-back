@@ -14,11 +14,13 @@ import com.easylive.entity.vo.PaginationResultVo;
 import com.easylive.enums.PageSizeEnum;
 import com.easylive.enums.ResponseEnum;
 import com.easylive.enums.SearchOrderTypeEnum;
+import com.easylive.enums.StatisticsTypeEnum;
 import com.easylive.enums.UserActionTypeEnum;
 import com.easylive.exception.BusinessException;
 import com.easylive.mappers.UserInfoMapper;
 import com.easylive.mappers.VideoCommentMapper;
 import com.easylive.mappers.VideoInfoMapper;
+import com.easylive.service.StatisticsInfoService;
 import com.easylive.service.UserActionService;
 import com.easylive.mappers.UserActionMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +52,9 @@ public class UserActionServiceImpl implements UserActionService {
 
     @Resource
     private EsSearchComponent esSearchComponent;
+
+    @Resource
+    private StatisticsInfoService statisticsInfoService;
 
     /**
      * 根据条件查询列表
@@ -194,6 +199,11 @@ public class UserActionServiceImpl implements UserActionService {
                     log.info("更新ES收藏数量");
                     esSearchComponent.updateDocCount(userAction.getVideoId(), SearchOrderTypeEnum.VIDEO_COLLECT.getField(), changeCount);
                 }
+                if (actionType == UserActionTypeEnum.VIDEO_LIKE) {
+                    statisticsInfoService.incrementStatistics(videoInfo.getUserId(), StatisticsTypeEnum.LIKE.getType(), changeCount);
+                } else if (actionType == UserActionTypeEnum.VIDEO_COLLECT) {
+                    statisticsInfoService.incrementStatistics(videoInfo.getUserId(), StatisticsTypeEnum.COLLECTION.getType(), changeCount);
+                }
                 log.info("点赞/收藏操作完成");
                 break;
             case VIDEO_COIN:
@@ -220,6 +230,10 @@ public class UserActionServiceImpl implements UserActionService {
                 }
                 userActionMapper.insert(userAction);
                 videoInfoMapper.updateCountInfo(userAction.getVideoId(), actionType.getField(), userAction.getActionCount());
+                statisticsInfoService.incrementStatistics(
+                        videoInfo.getUserId(),
+                        StatisticsTypeEnum.COIN.getType(),
+                        userAction.getActionCount());
                 log.info("投币操作完成");
                 break;
             case COMMENT_LIKE:

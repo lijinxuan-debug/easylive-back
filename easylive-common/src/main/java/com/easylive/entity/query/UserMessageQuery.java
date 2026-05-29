@@ -60,6 +60,28 @@ public class UserMessageQuery extends BaseQuery {
 
 	private String extendJsonFuzzy;
 
+	/**
+	 * 多类型查询，如 2,3 表示点赞+收藏
+	 */
+	private Integer[] messageTypeArray;
+
+	/**
+	 * 1：仅 @ 我的评论回复（extend 含 @昵称 或回复了我的评论）
+	 */
+	private Integer atMeOnly;
+
+	private String atMeKeyword;
+
+	/**
+	 * 1：仅「回复了我的评论」（extend 含非空 messageContentReply）
+	 */
+	private Integer replyOnly;
+
+	/**
+	 * 1：消息收件箱混合流（type 4 仅保留回复评论，其它类型正常返回）
+	 */
+	private Integer inboxFeed;
+
 	public void setMessageId(Integer messageId) {
 		this.messageId = messageId;
 	}
@@ -170,6 +192,46 @@ public class UserMessageQuery extends BaseQuery {
 
 	public String getExtendJsonFuzzy() {
 		return extendJsonFuzzy;
+	}
+
+	public Integer[] getMessageTypeArray() {
+		return messageTypeArray;
+	}
+
+	public void setMessageTypeArray(Integer[] messageTypeArray) {
+		this.messageTypeArray = messageTypeArray;
+	}
+
+	public Integer getAtMeOnly() {
+		return atMeOnly;
+	}
+
+	public void setAtMeOnly(Integer atMeOnly) {
+		this.atMeOnly = atMeOnly;
+	}
+
+	public String getAtMeKeyword() {
+		return atMeKeyword;
+	}
+
+	public void setAtMeKeyword(String atMeKeyword) {
+		this.atMeKeyword = atMeKeyword;
+	}
+
+	public Integer getReplyOnly() {
+		return replyOnly;
+	}
+
+	public void setReplyOnly(Integer replyOnly) {
+		this.replyOnly = replyOnly;
+	}
+
+	public Integer getInboxFeed() {
+		return inboxFeed;
+	}
+
+	public void setInboxFeed(Integer inboxFeed) {
+		this.inboxFeed = inboxFeed;
 	}
 
 }

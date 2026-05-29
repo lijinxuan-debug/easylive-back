@@ -50,12 +50,28 @@ public class DateUtils {
         return format(calendar.getTime(), DateTimePatternEnum.YYYY_MM_DD.getPattern());
     }
 
+    /**
+     * 过去 N 天（不含今天），例如 beforeDays=7 → 7 天前至昨天。
+     */
     public static List<String> getBeforeDates(Integer beforeDays) {
         LocalDate endDate = LocalDate.now();
         List<String> dateList = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         for (int i = beforeDays; i > 0; i--) {
             dateList.add(endDate.minusDays(i).format(formatter));
+        }
+        return dateList;
+    }
+
+    /**
+     * 最近 N 天（含今天），例如 days=7 → 从 6 天前到今天共 7 个点。
+     */
+    public static List<String> getRecentDatesIncludingToday(int days) {
+        LocalDate today = LocalDate.now();
+        List<String> dateList = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        for (int i = days - 1; i >= 0; i--) {
+            dateList.add(today.minusDays(i).format(formatter));
         }
         return dateList;
     }

@@ -98,6 +98,17 @@ public class UserInfo implements Serializable {
 
     private Boolean haveFocus;
 
+    /** 0未关注 1已互粉 2已关注 */
+    private Integer focusType;
+
+    public Integer getFocusType() {
+        return focusType;
+    }
+
+    public void setFocusType(Integer focusType) {
+        this.focusType = focusType;
+    }
+
     public Integer getFansCount() {
         return fansCount;
     }

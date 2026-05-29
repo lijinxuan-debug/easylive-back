@@ -11,8 +11,11 @@ import com.easylive.entity.vo.PaginationResultVo;
 import com.easylive.entity.query.SimplePage;
 import com.easylive.enums.PageSizeEnum;
 import com.easylive.enums.ResponseEnum;
+import com.easylive.enums.StatisticsTypeEnum;
 import com.easylive.exception.BusinessException;
 import com.easylive.mappers.UserInfoMapper;
+import com.easylive.service.StatisticsInfoService;
+import com.easylive.service.UserMessageService;
 import com.easylive.service.UserFocusService;
 import com.easylive.mappers.UserFocusMapper;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,12 @@ public class UserFocusServiceImpl implements UserFocusService {
 
     @Resource
     private UserInfoMapper<UserInfo, UserInfoQuery> userInfoMapper;
+
+    @Resource
+    private StatisticsInfoService statisticsInfoService;
+
+    @Resource
+    private UserMessageService userMessageService;
 
     /**
      * 根据条件查询列表
@@ -126,10 +135,13 @@ public class UserFocusServiceImpl implements UserFocusService {
         focus.setFocusUserId(focusUserId);
         focus.setFocusTime(new Date());
         userFocusMapper.insert(focus);
+        statisticsInfoService.incrementStatistics(focusUserId, StatisticsTypeEnum.FANS.getType(), 1);
+        userMessageService.saveFollowMessage(focusUserId, userId);
     }
 
     @Override
     public void cancelFocus(String userId, String focusUserId) {
         userFocusMapper.deleteByUserIdAndFocusUserId(userId, focusUserId);
+        statisticsInfoService.incrementStatistics(focusUserId, StatisticsTypeEnum.FANS.getType(), -1);
     }
 }

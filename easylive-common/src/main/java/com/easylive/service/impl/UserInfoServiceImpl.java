@@ -232,12 +232,20 @@ public class UserInfoServiceImpl implements UserInfoService {
         userInfo.setFansCount(fansCount);
         userInfo.setFocusCount(focusCount);
 
-        //关注状态
-        if (currentUserId == null) { //未登录，均显示未关注
+        // 关注状态：0未关注 1已互粉 2已关注
+        if (currentUserId == null) {
             userInfo.setHaveFocus(false);
+            userInfo.setFocusType(0);
         } else {
             UserFocus userFocus = userFocusMapper.selectByUserIdAndFocusUserId(currentUserId, userId);
-            userInfo.setHaveFocus(userFocus != null);
+            if (userFocus == null) {
+                userInfo.setHaveFocus(false);
+                userInfo.setFocusType(0);
+            } else {
+                userInfo.setHaveFocus(true);
+                UserFocus reverse = userFocusMapper.selectByUserIdAndFocusUserId(userId, currentUserId);
+                userInfo.setFocusType(reverse != null ? 1 : 2);
+            }
         }
         return userInfo;
     }

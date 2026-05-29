@@ -70,5 +70,9 @@ public interface UserMessageService {
 
     void saveMessage(String videoId, String sendUserId, MessageTypeEnum messageTypeEnum, String content, Integer replyCommentId);
 
+    void saveMessage(String videoId, String sendUserId, MessageTypeEnum messageTypeEnum, String content, Integer replyCommentId, Integer actionType);
+
+    void saveFollowMessage(String receiveUserId, String sendUserId);
+
     List<UserMessageCountDto> findNoReadCountGroup(String userId);
 }

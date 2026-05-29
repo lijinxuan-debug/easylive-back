@@ -15,10 +15,12 @@ import com.easylive.entity.query.SimplePage;
 import com.easylive.enums.CommentTopTypeEnum;
 import com.easylive.enums.PageSizeEnum;
 import com.easylive.enums.ResponseEnum;
+import com.easylive.enums.StatisticsTypeEnum;
 import com.easylive.enums.UserActionTypeEnum;
 import com.easylive.exception.BusinessException;
 import com.easylive.mappers.UserInfoMapper;
 import com.easylive.mappers.VideoInfoMapper;
+import com.easylive.service.StatisticsInfoService;
 import com.easylive.service.VideoCommentService;
 import com.easylive.mappers.VideoCommentMapper;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,9 @@ public class VideoCommentServiceImpl implements VideoCommentService {
 
     @Resource
     private UserInfoMapper<UserInfo, UserInfoQuery> userInfoMapper;
+
+    @Resource
+    private StatisticsInfoService statisticsInfoService;
 
     /**
      * 根据条件查询列表
@@ -152,6 +157,7 @@ public class VideoCommentServiceImpl implements VideoCommentService {
         videoCommentMapper.insert(videoComment);
         if (videoComment.getpCommentId() == 0) {//如果是一级评论，则更新视频的评论数
             videoInfoMapper.updateCountInfo(videoComment.getVideoId(), UserActionTypeEnum.VIDEO_COMMENT.getField(), Constants.ONE);
+            statisticsInfoService.incrementStatistics(videoInfo.getUserId(), StatisticsTypeEnum.COMMENT.getType(), Constants.ONE);
         }
     }
 
@@ -205,6 +211,7 @@ public class VideoCommentServiceImpl implements VideoCommentService {
 
         if (videoComment.getpCommentId() == 0) {//如果是一级评论，同时删除该评论下的子评论，并更新视频的评论数
             videoInfoMapper.updateCountInfo(videoComment.getVideoId(), UserActionTypeEnum.VIDEO_COMMENT.getField(), -Constants.ONE);
+            statisticsInfoService.incrementStatistics(videoInfo.getUserId(), StatisticsTypeEnum.COMMENT.getType(), -Constants.ONE);
             VideoCommentQuery videoCommentQuery = new VideoCommentQuery();
             videoCommentQuery.setpCommentId(commentId);
             videoCommentMapper.deleteByQuery(videoCommentQuery);

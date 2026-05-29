@@ -44,6 +44,7 @@ public class MessageOperationAspect {
     private static final String PARAMETERS_VIDEO_ID = "videoId";
     private static final String PARAMETERS_ACTION_TYPE = "actionType";
     private static final String PARAMETERS_REPLY_COMMENT_ID = "replyCommentId";
+    private static final String PARAMETERS_COMMENT_ID = "commentId";
     private static final String PARAMETERS_CONTENT = "content";
     private static final String PARAMETERS_AUDIT_REJECT_REASON = "reason";
 
@@ -55,11 +56,9 @@ public class MessageOperationAspect {
     @Around("requestInterceptor()")
     public ResponseVo interceptorDo(ProceedingJoinPoint joinPoint) throws Throwable {
         ResponseVo responseVo = (ResponseVo) joinPoint.proceed();
-        // 被增强的方法
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
         MessageInterceptor interceptor = method.getAnnotation(MessageInterceptor.class);
         if (interceptor != null) {
-            //注解对象，方法参数列表，参数值
             saveMessage(interceptor, method.getParameters(), joinPoint.getArgs());
         }
         return responseVo;
@@ -69,6 +68,7 @@ public class MessageOperationAspect {
         String videoId = null;
         Integer actionType = null;
         Integer replyCommentId = null;
+        Integer commentId = null;
         String content = null;
         for (int i = 0; i < parameters.length; i++) {
             if (PARAMETERS_VIDEO_ID.equals(parameters[i].getName())) {
@@ -77,19 +77,31 @@ public class MessageOperationAspect {
                 actionType = (Integer) args[i];
             } else if (PARAMETERS_REPLY_COMMENT_ID.equals(parameters[i].getName())) {
                 replyCommentId = (Integer) args[i];
+            } else if (PARAMETERS_COMMENT_ID.equals(parameters[i].getName())) {
+                commentId = (Integer) args[i];
             } else if (PARAMETERS_CONTENT.equals(parameters[i].getName())) {
                 content = (String) args[i];
             } else if (PARAMETERS_AUDIT_REJECT_REASON.equals(parameters[i].getName())) {
                 content = (String) args[i];
             }
         }
+        if (replyCommentId == null || replyCommentId <= 0) {
+            replyCommentId = commentId == null ? Constants.ZERO : commentId;
+        }
+
         MessageTypeEnum messageTypeEnum = interceptor.messageType();
         if (UserActionTypeEnum.VIDEO_COLLECT.getType().equals(actionType)) {
             messageTypeEnum = MessageTypeEnum.COLLECTION;
         }
 
         TokenUserInfoDto userInfo = getRequestUserInfo();
-        userMessageService.saveMessage(videoId, userInfo == null ? null : userInfo.getUserId(), messageTypeEnum, content, replyCommentId);
+        userMessageService.saveMessage(
+                videoId,
+                userInfo == null ? null : userInfo.getUserId(),
+                messageTypeEnum,
+                content,
+                replyCommentId,
+                actionType);
     }
 
     private TokenUserInfoDto getRequestUserInfo() {

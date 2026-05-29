@@ -58,6 +58,8 @@ public class VideoDanmu implements Serializable {
 
     private String nickName;
 
+    private String avatar;
+
     public String getVideoName() {
         return videoName;
     }
@@ -80,6 +82,14 @@ public class VideoDanmu implements Serializable {
 
     public void setNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     public void setDanmuId(Integer danmuId) {

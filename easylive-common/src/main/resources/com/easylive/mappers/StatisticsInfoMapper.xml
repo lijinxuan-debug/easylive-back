@@ -200,6 +200,14 @@
         where statistics_data = #{statisticsData} and user_id = #{userId} and data_type = #{dataType}
     </update>
 
+    <!-- 按天累加：存在则 statistics_count += delta，不存在则插入 -->
+    <insert id="incrementStatisticsCount">
+        insert into statistics_info (statistics_data, user_id, data_type, statistics_count)
+        values (#{statisticsData}, #{userId}, #{dataType}, #{delta})
+        on duplicate key update
+            statistics_count = statistics_count + #{delta}
+    </insert>
+
     <!--根据StatisticsDataAndUserIdAndDataType删除-->
     <delete id="deleteByStatisticsDataAndUserIdAndDataType">
         delete

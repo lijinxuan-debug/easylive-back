@@ -7,6 +7,8 @@ import java.util.List;
 import com.alibaba.fastjson.JSON;
 import com.easylive.entity.dto.UserMessageCountDto;
 import com.easylive.entity.dto.UserMessageExtendDto;
+import com.easylive.entity.constants.Constants;
+import com.easylive.entity.po.UserAction;
 import com.easylive.entity.po.UserMessage;
 import com.easylive.entity.po.VideoComment;
 import com.easylive.entity.po.VideoInfo;
@@ -16,13 +18,18 @@ import com.easylive.entity.vo.PaginationResultVo;
 import com.easylive.enums.MessageReadTypeEnum;
 import com.easylive.enums.MessageTypeEnum;
 import com.easylive.enums.PageSizeEnum;
+import com.easylive.enums.UserActionTypeEnum;
+import com.easylive.mappers.UserActionMapper;
 import com.easylive.mappers.VideoCommentMapper;
 import com.easylive.mappers.VideoInfoMapper;
 import com.easylive.mappers.VideoInfoPostMapper;
+import com.easylive.service.UserMessagePushService;
 import com.easylive.service.UserMessageService;
 import com.easylive.mappers.UserMessageMapper;
 import com.easylive.utils.JsonUtils;
+import com.easylive.utils.StringTools;
 import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +53,12 @@ public class UserMessageServiceImpl implements UserMessageService {
 
     @Resource
     private VideoInfoPostMapper<VideoInfoPost, VideoInfoPostQuery> videoInfoPostMapper;
+
+    @Resource
+    private UserActionMapper<UserAction, UserActionQuery> userActionMapper;
+
+    @Autowired(required = false)
+    private UserMessagePushService userMessagePushService;
 
     /**
      * 根据条件查询列表
@@ -136,23 +149,80 @@ public class UserMessageServiceImpl implements UserMessageService {
     @Override
     @Async
     public void saveMessage(String videoId, String sendUserId, MessageTypeEnum messageTypeEnum, String content, Integer replyCommentId) {
+        saveMessage(videoId, sendUserId, messageTypeEnum, content, replyCommentId, null);
+    }
+
+    @Override
+    @Async
+    public void saveMessage(String videoId, String sendUserId, MessageTypeEnum messageTypeEnum, String content, Integer replyCommentId, Integer actionType) {
         VideoInfo videoInfo = videoInfoMapper.selectByVideoId(videoId);
-        if (videoInfo == null) {
+        if (videoInfo == null || StringTools.isEmpty(sendUserId)) {
             return;
+        }
+
+        int targetCommentId = replyCommentId != null && replyCommentId > 0 ? replyCommentId : Constants.ZERO;
+        boolean isLikeOrCollect = ArrayUtils.contains(
+                new Integer[]{MessageTypeEnum.LIKE.getType(), MessageTypeEnum.COLLECTION.getType()},
+                messageTypeEnum.getType());
+
+        if (isLikeOrCollect) {
+            UserActionTypeEnum actionTypeEnum = UserActionTypeEnum.getByType(actionType);
+            if (actionTypeEnum == null) {
+                return;
+            }
+            if (actionTypeEnum != UserActionTypeEnum.VIDEO_LIKE
+                    && actionTypeEnum != UserActionTypeEnum.VIDEO_COLLECT
+                    && actionTypeEnum != UserActionTypeEnum.COMMENT_LIKE) {
+                return;
+            }
+            UserAction userAction = userActionMapper.selectByVideoIdAndCommentIdAndActionTypeAndUserId(
+                    videoId,
+                    targetCommentId,
+                    actionTypeEnum.getType(),
+                    sendUserId);
+            if (userAction == null) {
+                return;
+            }
         }
 
         UserMessageExtendDto userMessageDto = new UserMessageExtendDto();
         userMessageDto.setMessageContent(content);
+        userMessageDto.setCommentId(targetCommentId);
 
         String receiveUserId = videoInfo.getUserId();
+        boolean isCommentTarget = targetCommentId > 0;
+        if (isCommentTarget) {
+            VideoComment videoComment = videoCommentMapper.selectByCommentId(targetCommentId);
+            if (videoComment == null) {
+                return;
+            }
+            receiveUserId = videoComment.getUserId();
+            userMessageDto.setMessageContentReply(videoComment.getContent());
+            userMessageDto.setPreviewType("comment");
+        } else if (isLikeOrCollect) {
+            userMessageDto.setPreviewType("video");
+            if (StringTools.isEmpty(userMessageDto.getMessageContent())) {
+                userMessageDto.setMessageContent(videoInfo.getVideoName());
+            }
+        } else if (MessageTypeEnum.COMMENT.getType().equals(messageTypeEnum.getType())) {
+            userMessageDto.setPreviewType("video");
+        }
 
-        //点赞，收藏，已经记录过，不再重复记录
-        if (ArrayUtils.contains(new Integer[]{MessageTypeEnum.LIKE.getType(), MessageTypeEnum.COLLECTION.getType()},
-                messageTypeEnum.getType())) {
+        if (receiveUserId.equals(sendUserId)) {
+            return;
+        }
+
+        if (isLikeOrCollect) {
             UserMessageQuery query = new UserMessageQuery();
             query.setUserId(receiveUserId);
+            query.setSendUserId(sendUserId);
             query.setVideoId(videoId);
             query.setMessageType(messageTypeEnum.getType());
+            if (isCommentTarget) {
+                query.setExtendJsonFuzzy("\"commentId\":" + targetCommentId);
+            } else {
+                query.setExtendJsonFuzzy("\"previewType\":\"video\"");
+            }
             Integer count = userMessageMapper.selectCount(query);
             if (count > 0) {
                 return;
@@ -165,19 +235,14 @@ public class UserMessageServiceImpl implements UserMessageService {
         userMessage.setSendUserId(sendUserId);
         userMessage.setCreateTime(new Date());
         userMessage.setReadType(MessageReadTypeEnum.NO_READ.getType());
-        //评论特殊处理
-        if (replyCommentId != null) {
+
+        if (replyCommentId != null && replyCommentId > 0 && !isLikeOrCollect) {
             VideoComment videoComment = videoCommentMapper.selectByCommentId(replyCommentId);
             if (videoComment != null) {
                 receiveUserId = videoComment.getUserId();
                 userMessageDto.setMessageContentReply(videoComment.getContent());
             }
         }
-        //本人操作
-        if (receiveUserId.equals(sendUserId)) {
-            return;
-        }
-        //系统消息
         if (MessageTypeEnum.SYS.getType().equals(messageTypeEnum.getType())) {
             VideoInfoPost videoInfoPost = videoInfoPostMapper.selectByVideoId(videoId);
             userMessageDto.setAuditStatus(videoInfoPost.getStatus());
@@ -185,6 +250,36 @@ public class UserMessageServiceImpl implements UserMessageService {
         userMessage.setUserId(receiveUserId);
         userMessage.setExtendJson(JsonUtils.convertObj2Json(userMessageDto));
         userMessageMapper.insert(userMessage);
+        pushNewMessage(receiveUserId, userMessage);
+    }
+
+    @Override
+    @Async
+    public void saveFollowMessage(String receiveUserId, String sendUserId) {
+        if (StringTools.isEmpty(receiveUserId) || StringTools.isEmpty(sendUserId)) {
+            return;
+        }
+        if (receiveUserId.equals(sendUserId)) {
+            return;
+        }
+        UserMessageExtendDto extendDto = new UserMessageExtendDto();
+        extendDto.setMessageContent("关注了我");
+
+        UserMessage userMessage = new UserMessage();
+        userMessage.setUserId(receiveUserId);
+        userMessage.setSendUserId(sendUserId);
+        userMessage.setMessageType(MessageTypeEnum.FANS.getType());
+        userMessage.setReadType(MessageReadTypeEnum.NO_READ.getType());
+        userMessage.setCreateTime(new Date());
+        userMessage.setExtendJson(JsonUtils.convertObj2Json(extendDto));
+        userMessageMapper.insert(userMessage);
+        pushNewMessage(receiveUserId, userMessage);
+    }
+
+    private void pushNewMessage(String receiveUserId, UserMessage userMessage) {
+        if (userMessagePushService != null) {
+            userMessagePushService.onNewMessage(receiveUserId, userMessage);
+        }
     }
 
     @Override
