@@ -82,6 +82,11 @@ public class UserMessageQuery extends BaseQuery {
 	 */
 	private Integer inboxFeed;
 
+	/**
+	 * 1：新增粉丝(type=5)仅保留仍在 user_focus 中关注我的记录
+	 */
+	private Integer hideInactiveFans;
+
 	public void setMessageId(Integer messageId) {
 		this.messageId = messageId;
 	}
@@ -232,6 +237,14 @@ public class UserMessageQuery extends BaseQuery {
 
 	public void setInboxFeed(Integer inboxFeed) {
 		this.inboxFeed = inboxFeed;
+	}
+
+	public Integer getHideInactiveFans() {
+		return hideInactiveFans;
+	}
+
+	public void setHideInactiveFans(Integer hideInactiveFans) {
+		this.hideInactiveFans = hideInactiveFans;
 	}
 
 }

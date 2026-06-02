@@ -15,6 +15,7 @@ import com.easylive.enums.StatisticsTypeEnum;
 import com.easylive.exception.BusinessException;
 import com.easylive.mappers.UserInfoMapper;
 import com.easylive.service.StatisticsInfoService;
+import com.easylive.service.UserMessagePushService;
 import com.easylive.service.UserMessageService;
 import com.easylive.service.UserFocusService;
 import com.easylive.mappers.UserFocusMapper;
@@ -40,6 +41,9 @@ public class UserFocusServiceImpl implements UserFocusService {
 
     @Resource
     private UserMessageService userMessageService;
+
+    @Resource
+    private UserMessagePushService userMessagePushService;
 
     /**
      * 根据条件查询列表
@@ -137,11 +141,36 @@ public class UserFocusServiceImpl implements UserFocusService {
         userFocusMapper.insert(focus);
         statisticsInfoService.incrementStatistics(focusUserId, StatisticsTypeEnum.FANS.getType(), 1);
         userMessageService.saveFollowMessage(focusUserId, userId);
+        pushFollowStats(userId, focusUserId);
     }
 
     @Override
     public void cancelFocus(String userId, String focusUserId) {
         userFocusMapper.deleteByUserIdAndFocusUserId(userId, focusUserId);
         statisticsInfoService.incrementStatistics(focusUserId, StatisticsTypeEnum.FANS.getType(), -1);
+        userMessageService.removeFollowMessage(focusUserId, userId);
+        pushFollowStats(userId, focusUserId);
+    }
+
+    private int countFans(String focusUserId) {
+        UserFocusQuery query = new UserFocusQuery();
+        query.setFocusUserId(focusUserId);
+        Integer count = findCountByParam(query);
+        return count == null ? 0 : count;
+    }
+
+    private int countFocus(String userId) {
+        UserFocusQuery query = new UserFocusQuery();
+        query.setUserId(userId);
+        Integer count = findCountByParam(query);
+        return count == null ? 0 : count;
+    }
+
+    private void pushFollowStats(String operatorUserId, String focusUserId) {
+        if (userMessagePushService == null) {
+            return;
+        }
+        userMessagePushService.onFansCountChanged(focusUserId, countFans(focusUserId));
+        userMessagePushService.onFocusCountChanged(operatorUserId, countFocus(operatorUserId));
     }
 }

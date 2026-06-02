@@ -93,6 +93,16 @@
                 and u.extend_json like concat('%', #{query.atMeKeyword}, '%')
             </if>
         </if>
+        <if test="query.hideInactiveFans != null and query.hideInactiveFans == 1">
+            and (
+                u.message_type != 5
+                or exists (
+                    select 1 from user_focus f
+                    where f.user_id = u.send_user_id
+                      and f.focus_user_id = u.user_id
+                )
+            )
+        </if>
     </sql>
 
     <!--通用查询条件-->
@@ -376,10 +386,18 @@
     </delete>
 
     <select id="findNoReadCountGroup" resultType="com.easylive.entity.dto.UserMessageCountDto">
-        select message_type messageType, count(1) messageCount
-        from user_message
-        where user_id = #{userId}
-          and read_type = 0
-        group by message_type
+        select u.message_type messageType, count(1) messageCount
+        from user_message u
+        where u.user_id = #{userId}
+          and u.read_type = 0
+          and (
+            u.message_type != 5
+            or exists (
+                select 1 from user_focus f
+                where f.user_id = u.send_user_id
+                  and f.focus_user_id = u.user_id
+            )
+          )
+        group by u.message_type
     </select>
 </mapper>

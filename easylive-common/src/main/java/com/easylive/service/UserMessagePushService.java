@@ -10,4 +10,10 @@ public interface UserMessagePushService {
     void onNewMessage(String userId, UserMessage message);
 
     void onUnreadChanged(String userId);
+
+    /** 被关注用户的粉丝数变化 */
+    void onFansCountChanged(String userId, int fansCount);
+
+    /** 关注者的关注数变化 */
+    void onFocusCountChanged(String userId, int focusCount);
 }

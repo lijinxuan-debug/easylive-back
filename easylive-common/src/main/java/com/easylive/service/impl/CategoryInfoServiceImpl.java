@@ -213,9 +213,10 @@ public class CategoryInfoServiceImpl implements CategoryInfoService {
     @Override
     public List<CategoryInfo> getAllCategoryInfo() {
         List<CategoryInfo> categoryInfoList = redisComponent.getCategoryInfo();
-        if (categoryInfoList == null || categoryInfoList.isEmpty()) { //缓存中没有数据，则从数据库中查询
+        if (categoryInfoList == null || categoryInfoList.isEmpty()) {
             saveCategoryInfo2Redis();
+            categoryInfoList = redisComponent.getCategoryInfo();
         }
-        return categoryInfoList;
+        return categoryInfoList == null ? java.util.Collections.emptyList() : categoryInfoList;
     }
 }

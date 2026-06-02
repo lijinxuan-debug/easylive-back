@@ -74,5 +74,7 @@ public interface UserMessageService {
 
     void saveFollowMessage(String receiveUserId, String sendUserId);
 
+    void removeFollowMessage(String receiveUserId, String sendUserId);
+
     List<UserMessageCountDto> findNoReadCountGroup(String userId);
 }

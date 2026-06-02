@@ -105,6 +105,7 @@ public class UserMessageController extends ABaseController {
                 MessageTypeEnum.COMMENT.getType(),
                 MessageTypeEnum.FANS.getType(),
         });
+        userMessageQuery.setHideInactiveFans(1);
         PaginationResultVo<UserMessage> paginationResultVo = userMessageService.findListByPage(userMessageQuery);
         return getSuccessResponseVo(paginationResultVo);
     }
@@ -134,6 +135,9 @@ public class UserMessageController extends ABaseController {
             if (nickName != null && !nickName.trim().isEmpty()) {
                 userMessageQuery.setAtMeKeyword("@" + nickName.trim());
             }
+        }
+        if (MessageTypeEnum.FANS.getType().equals(messageType)) {
+            userMessageQuery.setHideInactiveFans(1);
         }
         PaginationResultVo<UserMessage> paginationResultVo = userMessageService.findListByPage(userMessageQuery);
         return getSuccessResponseVo(paginationResultVo);
